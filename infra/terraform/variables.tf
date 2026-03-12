@@ -119,9 +119,3 @@ variable "bot_mem_limit" {
   type        = string
   default     = "512m"
 }
-
-variable "postgres_mem_limit" {
-  description = "Memory limit for postgres container"
-  type        = string
-  default     = "256m"
-}

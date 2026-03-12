@@ -27,13 +27,12 @@ locals {
     POSTGRES_USER=${var.postgres_user}
     APP_IMAGE_NAME=${var.app_image_name}
     BOT_MEM_LIMIT=${var.bot_mem_limit}
-    POSTGRES_MEM_LIMIT=${var.postgres_mem_limit}
     RESTART_POLICY=unless-stopped
   EOT
 
   # backend/.env consumed by the Python app via pydantic-settings.
   app_env = <<-EOT
-    DATABASE_URL=postgresql+asyncpg://${var.postgres_user}:${var.postgres_password}@postgres:5432/${var.postgres_db}
+    DATABASE_URL=postgresql+asyncpg://${var.postgres_user}:${var.postgres_password}@host.docker.internal:5432/${var.postgres_db}
     REDIS_URL=redis://redis:6379
     TELEGRAM_BOT_TOKEN=${var.telegram_bot_token}
     TELEGRAM_CHANNEL_ID=${var.telegram_channel_id}
@@ -46,42 +45,12 @@ locals {
     LANGFUSE_BASE_URL=${var.langfuse_base_url}
   EOT
 
-  ssh_opts = "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p ${var.vps_ssh_port} -i ${var.ssh_private_key_path}"
+  ssh_opts = "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p ${var.vps_ssh_port} -i ${pathexpand(var.ssh_private_key_path)}"
 }
 
-# ── 1. Bootstrap: install Docker on the VPS ──────────────────────────────────
-
-resource "null_resource" "docker_install" {
-  connection {
-    type        = "ssh"
-    host        = var.vps_host
-    user        = var.vps_user
-    port        = var.vps_ssh_port
-    private_key = file(var.ssh_private_key_path)
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      # Idempotent: skip if docker is already present.
-      "command -v docker >/dev/null 2>&1 && echo 'Docker already installed' && exit 0",
-      "export DEBIAN_FRONTEND=noninteractive",
-      "apt-get update -qq",
-      "apt-get install -y -qq ca-certificates curl gnupg",
-      "install -m 0755 -d /etc/apt/keyrings",
-      "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg",
-      "chmod a+r /etc/apt/keyrings/docker.gpg",
-      "echo \"deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo $VERSION_CODENAME) stable\" > /etc/apt/sources.list.d/docker.list",
-      "apt-get update -qq",
-      "apt-get install -y -qq docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin",
-      "systemctl enable --now docker",
-    ]
-  }
-}
-
-# ── 2. Sync source code to the VPS ───────────────────────────────────────────
+# ── 1. Sync source code to the VPS ───────────────────────────────────────────
 
 resource "null_resource" "sync_source" {
-  depends_on = [null_resource.docker_install]
 
   triggers = {
     source_hash = local.source_hash
@@ -93,7 +62,7 @@ resource "null_resource" "sync_source" {
     host        = var.vps_host
     user        = var.vps_user
     port        = var.vps_ssh_port
-    private_key = file(var.ssh_private_key_path)
+    private_key = file(pathexpand(var.ssh_private_key_path))
   }
 
   provisioner "remote-exec" {
@@ -127,7 +96,7 @@ resource "null_resource" "sync_source" {
   }
 }
 
-# ── 3. Write .env files and deploy ───────────────────────────────────────────
+# ── 2. Write .env files and deploy ───────────────────────────────────────────
 
 resource "null_resource" "deploy" {
   depends_on = [null_resource.sync_source]
@@ -143,7 +112,7 @@ resource "null_resource" "deploy" {
     host        = var.vps_host
     user        = var.vps_user
     port        = var.vps_ssh_port
-    private_key = file(var.ssh_private_key_path)
+    private_key = file(pathexpand(var.ssh_private_key_path))
   }
 
   # Write root .env for docker-compose variable substitution
