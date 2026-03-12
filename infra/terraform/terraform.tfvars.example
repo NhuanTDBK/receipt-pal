@@ -1,0 +1,25 @@
+# ── SSH / VPS ─────────────────────────────────────────────────────────────────
+vps_host             = "vibe-vm"   # hostname from ~/.ssh/config, or a public IP
+vps_user             = "root"
+vps_ssh_port         = 22
+ssh_private_key_path = "~/.ssh/id_ed25519"
+app_dir              = "/opt/receipt-pal"
+
+# ── Database ───────────────────────────────────────────────────────────────────
+postgres_password = "CHANGE_ME_strong_password"
+postgres_db       = "receipt_pal"
+postgres_user     = "receipt_pal"
+
+# ── Telegram ───────────────────────────────────────────────────────────────────
+telegram_bot_token  = "CHANGE_ME_bot_token"
+telegram_channel_id = "@receiptpal_bot"
+
+# ── AI / LLM ───────────────────────────────────────────────────────────────────
+gemini_api_key = "CHANGE_ME_gemini_key"
+gemini_model   = "gemini-2.0-flash-lite"
+openai_api_key = ""   # optional
+
+# ── Observability (optional — leave empty to disable) ─────────────────────────
+langfuse_public_key = ""
+langfuse_secret_key = ""
+langfuse_base_url   = "https://cloud.langfuse.com"

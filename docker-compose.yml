@@ -1,0 +1,106 @@
+services:
+  postgres:
+    image: ${POSTGRES_IMAGE:-postgres:15-alpine}
+    container_name: ${POSTGRES_CONTAINER_NAME:-receipt-pal-postgres}
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-receipt_pal}
+      - POSTGRES_USER=${POSTGRES_USER:-receipt_pal}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    command:
+      - "postgres"
+      - "-c"
+      - "shared_buffers=${POSTGRES_SHARED_BUFFERS:-64MB}"
+      - "-c"
+      - "work_mem=${POSTGRES_WORK_MEM:-4MB}"
+      - "-c"
+      - "effective_cache_size=${POSTGRES_EFFECTIVE_CACHE_SIZE:-256MB}"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: ${RESTART_POLICY:-unless-stopped}
+    mem_limit: ${POSTGRES_MEM_LIMIT:-256m}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-receipt_pal}"]
+      interval: ${POSTGRES_HEALTHCHECK_INTERVAL:-10s}
+      timeout: ${POSTGRES_HEALTHCHECK_TIMEOUT:-5s}
+      retries: ${POSTGRES_HEALTHCHECK_RETRIES:-5}
+
+  redis:
+    image: ${REDIS_IMAGE:-redis:7-alpine}
+    container_name: ${REDIS_CONTAINER_NAME:-receipt-pal-redis}
+    command:
+      - "redis-server"
+      - "--maxmemory"
+      - "${REDIS_MAX_MEMORY:-48mb}"
+      - "--maxmemory-policy"
+      - "${REDIS_MAX_MEMORY_POLICY:-allkeys-lru}"
+    volumes:
+      - redis_data:/data
+    restart: ${RESTART_POLICY:-unless-stopped}
+    mem_limit: ${REDIS_MEM_LIMIT:-64m}
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: ${REDIS_HEALTHCHECK_INTERVAL:-10s}
+      timeout: ${REDIS_HEALTHCHECK_TIMEOUT:-5s}
+      retries: ${REDIS_HEALTHCHECK_RETRIES:-5}
+
+  db-migrate:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: production
+    image: ${APP_IMAGE_NAME:-receipt-pal-app}
+    container_name: ${MIGRATE_CONTAINER_NAME:-receipt-pal-migrate}
+    command: ["python", "-m", "alembic", "upgrade", "head"]
+    environment:
+      - PYTHONPATH=/app
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-receipt_pal}:${POSTGRES_PASSWORD}@${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-receipt_pal}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    env_file: backend/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  bot:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: production
+    image: ${APP_IMAGE_NAME:-receipt-pal-app}
+    container_name: ${BOT_CONTAINER_NAME:-receipt-pal-bot}
+    command: ["python", "scripts/run_bot.py"]
+    environment:
+      - PYTHONPATH=/app
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-receipt_pal}:${POSTGRES_PASSWORD}@${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-receipt_pal}
+      - REDIS_URL=redis://${REDIS_HOST:-redis}:${REDIS_PORT:-6379}
+      - ROCKSDB_PATH=${ROCKSDB_PATH:-/app/data/rocksdb}
+      - CONVERSATION_TIMEOUT_MINUTES=${CONVERSATION_TIMEOUT_MINUTES:-30}
+    env_file: backend/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      db-migrate:
+        condition: service_completed_successfully
+    volumes:
+      - rocksdb_data:/app/data/rocksdb
+    restart: ${RESTART_POLICY:-unless-stopped}
+    mem_limit: ${BOT_MEM_LIMIT:-512m}
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  rocksdb_data:
+    driver: local
+
+networks:
+  default:
+    name: ${COMPOSE_NETWORK_NAME:-receipt-pal-network}
+    driver: bridge
+    driver_opts:
+      com.docker.network.driver.mtu: "1450"
+
