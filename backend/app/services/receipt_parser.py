@@ -1,0 +1,340 @@
+"""Receipt parsing service using Gemini Flash vision AI (ported from POC)."""
+
+from __future__ import annotations
+
+import base64
+import json
+from collections.abc import AsyncIterator, Callable, Coroutine
+from pathlib import Path
+from typing import Any
+
+from openai import AsyncOpenAI
+
+from app.config import settings
+
+SYSTEM_PROMPT_PATH = Path(__file__).resolve().parent.parent.parent.parent / "docs" / "system_prompt.md"
+
+TOOLS: list[dict] = [
+    {
+        "type": "function",
+        "function": {
+            "name": "AskUser",
+            "description": "Ask one clarification question. For missing/uncertain fields and edit navigation.",
+            "parameters": {
+                "type": "object",
+                "required": ["question", "options"],
+                "properties": {
+                    "question": {"type": "string"},
+                    "options": {"type": "array", "items": {"type": "string"}},
+                    "allow_skip": {"type": "boolean"},
+                    "field": {
+                        "type": "string",
+                        "enum": ["total", "date", "merchant", "category", "line_item", "edit_selection"],
+                    },
+                },
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "SubmitReceipt",
+            "description": (
+                "Emit structured receipt data. "
+                "mode=draft: send full receipt fields, shows card to user. "
+                'mode=final: send ONLY {"mode": "final"}.'
+            ),
+            "parameters": {
+                "type": "object",
+                "required": ["mode"],
+                "properties": {
+                    "mode": {"type": "string", "enum": ["draft", "final"]},
+                    "merchant": {
+                        "type": "object",
+                        "required": ["name"],
+                        "properties": {
+                            "name": {"type": "string"},
+                            "address": {"type": "string"},
+                        },
+                    },
+                    "datetime": {"type": "string"},
+                    "billing_period": {"type": "string"},
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": ["name", "amount"],
+                            "properties": {
+                                "name": {"type": "string"},
+                                "name_raw": {"type": "string"},
+                                "quantity": {"type": "integer", "default": 1},
+                                "unit_price": {"type": "integer"},
+                                "amount": {"type": "integer"},
+                                "confidence": {"type": "string", "enum": ["high", "medium", "low"]},
+                                "toppings": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "name": {"type": "string"},
+                                            "price": {"type": "integer"},
+                                        },
+                                    },
+                                },
+                                "modifiers": {
+                                    "type": "object",
+                                    "properties": {
+                                        "sugar_level": {"type": "string"},
+                                        "ice_level": {"type": "string"},
+                                        "size": {"type": "string"},
+                                    },
+                                },
+                                "food_tags": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "enum": ["sugary", "fried", "healthy", "alcohol", "caffeine", "dairy", "spicy", "non_food"],
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    "subtotal": {"type": "integer"},
+                    "discount": {"type": "integer"},
+                    "tax_rate": {"type": "number"},
+                    "tax_amount": {"type": "integer"},
+                    "total": {"type": "integer"},
+                    "currency": {"type": "string", "default": "VND"},
+                    "category": {
+                        "type": "string",
+                        "enum": ["dining", "cafe", "grocery", "convenience", "health", "entertainment", "transport", "utilities", "rent", "other"],
+                    },
+                    "source": {
+                        "type": "string",
+                        "enum": ["paper", "shopeefood", "grabfood", "gofood", "baemin", "app_unknown"],
+                        "default": "paper",
+                    },
+                    "notes": {"type": "string"},
+                },
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "UpdateReceipt",
+            "description": (
+                "Patch the current draft receipt. Send ONLY the fields that changed. "
+                "Items are matched by their [id] shown in the receipt card."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "merchant": {
+                        "type": "object",
+                        "properties": {
+                            "name": {"type": "string"},
+                            "address": {"type": "string"},
+                        },
+                    },
+                    "datetime": {"type": "string"},
+                    "category": {"type": "string"},
+                    "currency": {"type": "string"},
+                    "subtotal": {"type": "integer"},
+                    "discount": {"type": "integer"},
+                    "tax_rate": {"type": "number"},
+                    "tax_amount": {"type": "integer"},
+                    "total": {"type": "integer"},
+                    "notes": {"type": "string"},
+                    "items": {
+                        "type": "array",
+                        "description": "Only changed items. Each must include 'id'.",
+                        "items": {
+                            "type": "object",
+                            "required": ["id"],
+                            "properties": {
+                                "id": {"type": "integer"},
+                                "name": {"type": "string"},
+                                "quantity": {"type": "integer"},
+                                "unit_price": {"type": "integer"},
+                                "amount": {"type": "integer"},
+                                "toppings": {"type": "array"},
+                                "modifiers": {"type": "object"},
+                                "food_tags": {"type": "array"},
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    },
+]
+
+ToolCallback = Callable[[str, dict], Coroutine[Any, Any, str]]
+
+
+def _load_system_prompt() -> str:
+    try:
+        text = SYSTEM_PROMPT_PATH.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        text = "You are Receipt Pal, a Vietnamese receipt-parsing assistant on Telegram."
+
+    text += (
+        "\n\n---\n\n"
+        "NOTE: The user is interacting via Telegram. Use inline keyboard buttons via AskUser.\n"
+        "IMPORTANT: Only call ONE tool per response. Do not chain tools in a single turn.\n"
+        "EDIT FLOW: SubmitReceipt(draft) → user correction → UpdateReceipt(patch) → repeat → SubmitReceipt(final)."
+    )
+    return text
+
+
+def _encode_images(images: list[bytes]) -> list[dict]:
+    """Encode image bytes as base64 data URLs for the vision API."""
+    encoded = []
+    for img_bytes in images:
+        b64 = base64.b64encode(img_bytes).decode("utf-8")
+        encoded.append({
+            "type": "image_url",
+            "image_url": {"url": f"data:image/jpeg;base64,{b64}"},
+        })
+    return encoded
+
+
+def _build_messages(
+    history: list[dict],
+    new_images: list[bytes],
+    new_text: str | None,
+) -> list[dict]:
+    """Build the full messages list for the Gemini API call."""
+    messages: list[dict] = [{"role": "system", "content": _load_system_prompt()}]
+    messages.extend(history)
+
+    user_content: list[dict] = []
+    if new_text:
+        user_content.append({"type": "text", "text": new_text})
+    if new_images:
+        user_content.extend(_encode_images(new_images))
+
+    if user_content:
+        messages.append({"role": "user", "content": user_content})
+
+    return messages
+
+
+class ReceiptParser:
+    """Streams Gemini and dispatches AskUser / SubmitReceipt / UpdateReceipt tool calls."""
+
+    def __init__(self) -> None:
+        self._client = AsyncOpenAI(
+            api_key=settings.gemini_api_key,
+            base_url=settings.gemini_base_url,
+        )
+
+    async def parse(
+        self,
+        images: list[bytes],
+        history: list[dict],
+        new_text: str | None,
+        on_tool_call: ToolCallback,
+    ) -> list[dict]:
+        """Call Gemini with images + conversation history.
+
+        Tool results are dispatched to `on_tool_call(tool_name, args)`.
+        Returns the updated message list (history + this turn) for the caller to persist.
+        """
+        messages = _build_messages(history, images, new_text)
+
+        full_content = ""
+        tool_calls_by_idx: dict[int, dict] = {}
+
+        stream = await self._client.chat.completions.create(
+            model=settings.gemini_model,
+            messages=messages,
+            tools=TOOLS,
+            tool_choice="auto",
+            stream=True,
+        )
+
+        async for chunk in stream:
+            if not chunk.choices:
+                continue
+            delta = chunk.choices[0].delta
+
+            if delta.content:
+                full_content += delta.content
+
+            raw_chunk = chunk.model_dump()
+            raw_tool_calls = (
+                raw_chunk.get("choices", [{}])[0].get("delta", {}).get("tool_calls") or []
+            )
+            for tc_raw in raw_tool_calls:
+                idx = tc_raw.get("index", 0)
+                if idx not in tool_calls_by_idx:
+                    tool_calls_by_idx[idx] = {
+                        "id": "",
+                        "type": "function",
+                        "function": {"name": "", "arguments": ""},
+                    }
+                if tc_raw.get("id"):
+                    tool_calls_by_idx[idx]["id"] = tc_raw["id"]
+                fn = tc_raw.get("function") or {}
+                if fn.get("name"):
+                    tool_calls_by_idx[idx]["function"]["name"] += fn["name"]
+                if fn.get("arguments"):
+                    tool_calls_by_idx[idx]["function"]["arguments"] += fn["arguments"]
+                extra = tc_raw.get("extra_content")
+                if extra:
+                    tool_calls_by_idx[idx]["extra_content"] = extra
+
+        tool_calls = [tool_calls_by_idx[i] for i in sorted(tool_calls_by_idx.keys())]
+
+        assistant_msg: dict = {"role": "assistant", "content": full_content}
+        if tool_calls:
+            assistant_msg["tool_calls"] = tool_calls
+        messages.append(assistant_msg)
+
+        for tc in tool_calls:
+            fn_name = tc["function"]["name"]
+            raw_args = tc["function"]["arguments"]
+            try:
+                fn_args = json.loads(raw_args) if isinstance(raw_args, str) else raw_args
+            except json.JSONDecodeError:
+                fn_args = {}
+
+            result = await on_tool_call(fn_name, fn_args)
+
+            messages.append({
+                "role": "tool",
+                "tool_call_id": tc["id"],
+                "content": result,
+            })
+
+        return messages
+
+
+def apply_update_patch(current: dict, patch: dict) -> dict:
+    """Merge a patch from UpdateReceipt into the current draft receipt."""
+    updated = dict(current)
+    for key, value in patch.items():
+        if key == "merchant":
+            updated["merchant"] = {**updated.get("merchant", {}), **value}
+        elif key == "items":
+            items = [dict(item) for item in updated.get("items", [])]
+            for item_patch in value:
+                patch_id = item_patch.get("id")
+                for item in items:
+                    if item.get("id") == patch_id:
+                        item.update({k: v for k, v in item_patch.items() if k != "id"})
+                        break
+            updated["items"] = items
+        else:
+            updated[key] = value
+    return updated
+
+
+def assign_item_ids(receipt: dict) -> dict:
+    """Assign sequential integer IDs to items for UpdateReceipt patch matching."""
+    receipt = dict(receipt)
+    for i, item in enumerate(receipt.get("items", []), start=1):
+        item["id"] = i
+    return receipt
