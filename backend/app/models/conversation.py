@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, String, Text, func
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text, func
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -20,6 +20,10 @@ class Conversation(Base):
         DateTime(timezone=True), server_default=func.now()
     )
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+
+    input_tokens: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    output_tokens: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    total_tokens: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 
     user: Mapped["User"] = relationship(back_populates="conversations")
     messages: Mapped[list["ConversationMessage"]] = relationship(

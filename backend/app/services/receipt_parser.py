@@ -4,15 +4,37 @@ from __future__ import annotations
 
 import base64
 import json
+import logging
 from collections.abc import AsyncIterator, Callable, Coroutine
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from openai import AsyncOpenAI
+from langfuse.openai import AsyncOpenAI
 
 from app.config import settings
 
+logger = logging.getLogger(__name__)
+
 SYSTEM_PROMPT_PATH = Path(__file__).resolve().parent.parent.parent.parent / "docs" / "system_prompt.md"
+
+
+@dataclass
+class TokenUsage:
+    """Token consumption for a single Gemini API call."""
+
+    input_tokens: int = 0
+    output_tokens: int = 0
+
+    @property
+    def total_tokens(self) -> int:
+        return self.input_tokens + self.output_tokens
+
+    def __add__(self, other: "TokenUsage") -> "TokenUsage":
+        return TokenUsage(
+            input_tokens=self.input_tokens + other.input_tokens,
+            output_tokens=self.output_tokens + other.output_tokens,
+        )
 
 TOOLS: list[dict] = [
     {
@@ -236,16 +258,30 @@ class ReceiptParser:
         history: list[dict],
         new_text: str | None,
         on_tool_call: ToolCallback,
-    ) -> list[dict]:
+        *,
+        session_id: str | None = None,
+        user_id: str | None = None,
+    ) -> tuple[list[dict], TokenUsage]:
         """Call Gemini with images + conversation history.
 
         Tool results are dispatched to `on_tool_call(tool_name, args)`.
-        Returns the updated message list (history + this turn) for the caller to persist.
+        Returns (updated_messages, token_usage) for the caller to persist.
+
+        session_id: str(conversation.id) — used as Langfuse session_id and DB conversation key.
+        user_id:    str(db_user.id)      — forwarded to Langfuse for per-user trace filtering.
         """
         messages = _build_messages(history, images, new_text)
 
         full_content = ""
         tool_calls_by_idx: dict[int, dict] = {}
+        usage = TokenUsage()
+
+        # Langfuse trace enrichment kwargs (silently ignored when Langfuse keys are absent)
+        langfuse_kwargs: dict = {"name": "receipt-parse"}
+        if session_id:
+            langfuse_kwargs["session_id"] = session_id
+        if user_id:
+            langfuse_kwargs["user_id"] = user_id
 
         stream = await self._client.chat.completions.create(
             model=settings.gemini_model,
@@ -253,9 +289,18 @@ class ReceiptParser:
             tools=TOOLS,
             tool_choice="auto",
             stream=True,
+            stream_options={"include_usage": True},
+            **langfuse_kwargs,
         )
 
         async for chunk in stream:
+            # chunk.usage is non-None only on the final streaming chunk
+            if chunk.usage is not None:
+                usage = TokenUsage(
+                    input_tokens=chunk.usage.prompt_tokens or 0,
+                    output_tokens=chunk.usage.completion_tokens or 0,
+                )
+
             if not chunk.choices:
                 continue
             delta = chunk.choices[0].delta
@@ -286,6 +331,11 @@ class ReceiptParser:
                 if extra:
                     tool_calls_by_idx[idx]["extra_content"] = extra
 
+        if usage.total_tokens == 0:
+            logger.warning(
+                "No token usage returned by Gemini API (session_id=%s).", session_id
+            )
+
         tool_calls = [tool_calls_by_idx[i] for i in sorted(tool_calls_by_idx.keys())]
 
         assistant_msg: dict = {"role": "assistant", "content": full_content}
@@ -309,7 +359,7 @@ class ReceiptParser:
                 "content": result,
             })
 
-        return messages
+        return messages, usage
 
 
 def apply_update_patch(current: dict, patch: dict) -> dict:

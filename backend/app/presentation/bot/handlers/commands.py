@@ -12,7 +12,7 @@ from app.presentation.bot.formatters.receipt_formatter import (
     format_currency,
     format_history_item,
 )
-from app.repositories import receipt_repo, user_repo
+from app.repositories import conversation_repo, receipt_repo, user_repo
 
 router = Router(name="commands")
 
@@ -22,6 +22,7 @@ WELCOME_MESSAGE = (
     "<b>Commands:</b>\n"
     "/history — your last 10 receipts\n"
     "/stats — spending by category\n"
+    "/usage — token usage stats\n"
     "/help — show this message"
 )
 
@@ -35,6 +36,7 @@ HELP_MESSAGE = (
     "<b>Commands:</b>\n"
     "/history — last 10 saved receipts\n"
     "/stats — spending totals by category\n"
+    "/usage — token usage stats\n"
     "/help — this message"
 )
 
@@ -113,4 +115,33 @@ async def cmd_stats(message: Message, session: AsyncSession) -> None:
         lines.append(f"{icon} {cat}: <b>{amount}</b> ({pct}%)")
 
     lines.append(f"\n💰 Grand total: <b>{format_currency(grand_total)}</b>")
+    await message.answer("\n".join(lines))
+
+
+@router.message(Command("usage"))
+async def cmd_usage(message: Message, session: AsyncSession) -> None:
+    user = message.from_user
+    db_user = await user_repo.get_or_create_user(
+        session,
+        telegram_id=user.id,
+        username=user.username,
+        first_name=user.first_name or "Friend",
+    )
+    stats = await conversation_repo.get_usage_stats(session, db_user.id)
+
+    if stats["total_tokens"] == 0:
+        await message.answer("No token usage yet. Send a receipt photo to get started! 📸")
+        return
+
+    def fmt(n: int) -> str:
+        return f"{n:,}"
+
+    lines = [
+        "📊 <b>Your token usage</b>\n",
+        f"Input tokens:   <b>{fmt(stats['input_tokens'])}</b>",
+        f"Output tokens:  <b>{fmt(stats['output_tokens'])}</b>",
+        "─────────────────────",
+        f"Total tokens:   <b>{fmt(stats['total_tokens'])}</b>",
+        f"\nAcross <b>{stats['conversation_count']}</b> conversation(s)",
+    ]
     await message.answer("\n".join(lines))

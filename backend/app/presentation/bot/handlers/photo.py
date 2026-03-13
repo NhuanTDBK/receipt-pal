@@ -16,7 +16,7 @@ from app.presentation.bot.keyboards.receipt import ask_user_keyboard, receipt_re
 from app.presentation.bot.states import ReceiptFlow
 from app.repositories import conversation_repo, user_repo
 from app.services.photo_store import PhotoStore
-from app.services.receipt_parser import ReceiptParser, assign_item_ids
+from app.services.receipt_parser import ReceiptParser, TokenUsage, assign_item_ids
 
 logger = logging.getLogger(__name__)
 router = Router(name="photo")
@@ -190,12 +190,21 @@ async def _process_photos(
         return f"Unknown tool: {tool_name}"
 
     try:
-        await parser.parse(
+        _, usage = await parser.parse(
             images=images,
             history=history,
             new_text="Here is a receipt photo. Please parse it.",
             on_tool_call=on_tool_call,
+            session_id=str(conversation.id),  # → Langfuse session_id + DB conversation key
+            user_id=str(db_user.id),          # → Langfuse user_id
         )
+        await conversation_repo.add_token_usage(
+            session,
+            conversation_id=conversation.id,
+            input_tokens=usage.input_tokens,
+            output_tokens=usage.output_tokens,
+        )
+        await session.commit()
     except Exception as exc:
         logger.exception("Parser error: %s", exc)
         await status_msg.edit_text("⚠️ Failed to parse the receipt. Please try again.")

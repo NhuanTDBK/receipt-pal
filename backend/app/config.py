@@ -29,6 +29,12 @@ class Settings(BaseSettings):
     # Optional Redis for FSM (falls back to MemoryStorage)
     redis_url: str | None = None
 
+    # Langfuse (optional — LLM observability)
+    # SDK reads these from env automatically; fields here are for validation only.
+    langfuse_secret_key: str | None = None
+    langfuse_public_key: str | None = None
+    langfuse_base_url: str = "https://cloud.langfuse.com"
+
     # Bot operational settings
     telegram_force_ipv4: bool = True
     telegram_network_retry_attempts: int = 3

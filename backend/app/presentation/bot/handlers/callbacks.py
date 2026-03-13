@@ -183,12 +183,22 @@ async def handle_edit_input(
         return f"Unhandled tool in edit mode: {tool_name}"
 
     try:
-        await parser.parse(
+        _, usage = await parser.parse(
             images=[],
             history=history,
             new_text=message.text,
             on_tool_call=on_tool_call,
+            session_id=conversation_id,  # str(conversation.id) → Langfuse session_id + DB key
+            user_id=user_id,             # str(db_user.id)       → Langfuse user_id
         )
+        if conversation_id:
+            await conversation_repo.add_token_usage(
+                session,
+                conversation_id=uuid.UUID(conversation_id),
+                input_tokens=usage.input_tokens,
+                output_tokens=usage.output_tokens,
+            )
+            await session.commit()
     except Exception as exc:
         logger.exception("Edit parse error: %s", exc)
         await status_msg.edit_text("⚠️ Could not apply the edit. Please try again.")

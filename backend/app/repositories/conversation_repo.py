@@ -1,7 +1,7 @@
 import uuid
 from datetime import UTC, datetime, timedelta
 
-from sqlalchemy import select
+from sqlalchemy import func, select, update as sa_update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -89,3 +89,50 @@ async def load_history(
         .order_by(ConversationMessage.created_at.asc())
     )
     return list(result.scalars().all())
+
+
+async def add_token_usage(
+    session: AsyncSession,
+    conversation_id: uuid.UUID,
+    input_tokens: int,
+    output_tokens: int,
+) -> None:
+    """Atomically increment token counters on a conversation row.
+
+    Uses SQL column arithmetic (col + :delta) to avoid race conditions when
+    multiple parse calls occur concurrently on the same conversation.
+    """
+    if input_tokens == 0 and output_tokens == 0:
+        return
+
+    await session.execute(
+        sa_update(Conversation)
+        .where(Conversation.id == conversation_id)
+        .values(
+            input_tokens=Conversation.input_tokens + input_tokens,
+            output_tokens=Conversation.output_tokens + output_tokens,
+            total_tokens=Conversation.total_tokens + input_tokens + output_tokens,
+        )
+    )
+    await session.flush()
+
+
+async def get_usage_stats(
+    session: AsyncSession, user_id: uuid.UUID
+) -> dict[str, int]:
+    """Return aggregated token usage across all conversations for a user."""
+    result = await session.execute(
+        select(
+            func.coalesce(func.sum(Conversation.input_tokens), 0).label("input_tokens"),
+            func.coalesce(func.sum(Conversation.output_tokens), 0).label("output_tokens"),
+            func.coalesce(func.sum(Conversation.total_tokens), 0).label("total_tokens"),
+            func.count(Conversation.id).label("conversation_count"),
+        ).where(Conversation.user_id == user_id)
+    )
+    row = result.one()
+    return {
+        "input_tokens": row.input_tokens,
+        "output_tokens": row.output_tokens,
+        "total_tokens": row.total_tokens,
+        "conversation_count": row.conversation_count,
+    }
