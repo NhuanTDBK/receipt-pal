@@ -18,7 +18,8 @@ router = Router(name="commands")
 
 WELCOME_MESSAGE = (
     "👋 Welcome to <b>Receipt Pal</b>!\n\n"
-    "Send me a photo (or multiple photos) of your receipt and I'll parse it for you.\n\n"
+    "Send me a <b>photo</b> or <b>PDF</b> of your receipt and I'll parse it for you.\n"
+    "Multiple photos of the same receipt? Send them all at once!\n\n"
     "<b>Commands:</b>\n"
     "/history — your last 10 receipts\n"
     "/stats — spending by category\n"
@@ -28,8 +29,10 @@ WELCOME_MESSAGE = (
 
 HELP_MESSAGE = (
     "<b>Receipt Pal — How to use</b>\n\n"
-    "📸 <b>Parse a receipt:</b> Send one or more photos of the receipt.\n"
+    "📸 <b>Parse a photo receipt:</b> Send one or more photos of the receipt.\n"
     "   Multiple photos = same receipt captured in parts.\n\n"
+    "📄 <b>Parse a PDF receipt:</b> Send a PDF file directly.\n"
+    "   Works with invoices, delivery confirmations, and utility bills (max 20 MB).\n\n"
     "✅ <b>Confirm</b> the parsed card to save it.\n"
     "✏️ <b>Edit</b> to correct any field.\n"
     "❌ <b>Cancel</b> to discard.\n\n"
@@ -130,7 +133,7 @@ async def cmd_usage(message: Message, session: AsyncSession) -> None:
     stats = await conversation_repo.get_usage_stats(session, db_user.id)
 
     if stats["total_tokens"] == 0:
-        await message.answer("No token usage yet. Send a receipt photo to get started! 📸")
+        await message.answer("No token usage yet. Send a receipt photo or PDF to get started! 📸")
         return
 
     def fmt(n: int) -> str:

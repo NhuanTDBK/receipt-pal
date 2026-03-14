@@ -106,11 +106,13 @@ class BotManager:
     def _setup_handlers(self) -> None:
         from app.presentation.bot.handlers.commands import router as commands_router
         from app.presentation.bot.handlers.photo import router as photo_router
+        from app.presentation.bot.handlers.document import router as document_router
         from app.presentation.bot.handlers.callbacks import router as callbacks_router
 
         self._dp.include_router(commands_router)
         self._dp.include_router(callbacks_router)
         self._dp.include_router(photo_router)
+        self._dp.include_router(document_router)
 
     async def send_message(
         self,

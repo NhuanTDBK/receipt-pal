@@ -70,14 +70,23 @@ def _build_gemini_history(messages) -> list[dict]:
     return result
 
 
-async def _process_photos(
+async def _process_receipt(
     message: Message,
     file_ids: list[str],
     session: AsyncSession,
     state: FSMContext,
     bot: Bot,
+    *,
+    is_pdf: bool = False,
 ) -> None:
-    """Core logic: download photos, call parser, handle tool results."""
+    """Core logic: download receipt media, call parser, handle tool results.
+
+    Works for both photo receipts (is_pdf=False) and PDF receipts (is_pdf=True).
+    file_ids are Telegram file IDs; bytes are cached in PhotoStore by file_id.
+    """
+    media_label = "PDF receipt" if is_pdf else "receipt photo"
+    user_text = f"Here is a {media_label}. Please parse it."
+
     user = message.from_user
     db_user = await user_repo.get_or_create_user(
         session,
@@ -92,7 +101,7 @@ async def _process_photos(
         session,
         conversation_id=conversation.id,
         role="user",
-        content="Here is a receipt photo. Please parse it.",
+        content=user_text,
         image_file_ids=file_ids,
     )
     await session.commit()
@@ -100,17 +109,20 @@ async def _process_photos(
     history_msgs = await conversation_repo.load_history(session, conversation.id)
     history = _build_gemini_history(history_msgs[:-1])
 
-    images: list[bytes] = []
+    media_bytes: list[bytes] = []
     for fid in file_ids:
         data = await _get_or_download_image(bot, fid)
         if data:
-            images.append(data)
+            media_bytes.append(data)
 
-    if not images:
-        await message.answer("⚠️ Could not download the photo. Please try again.")
+    if not media_bytes:
+        label = "PDF" if is_pdf else "photo"
+        await message.answer(f"⚠️ Could not download the {label}. Please try again.")
         return
 
-    status_msg = await message.answer("🔍 Parsing your receipt...")
+    status_msg = await message.answer(
+        "🔍 Parsing your PDF receipt…" if is_pdf else "🔍 Parsing your receipt..."
+    )
 
     parser = ReceiptParser()
     state_data = await state.get_data()
@@ -189,15 +201,21 @@ async def _process_photos(
 
         return f"Unknown tool: {tool_name}"
 
+    parse_kwargs: dict = dict(
+        history=history,
+        new_text=user_text,
+        on_tool_call=on_tool_call,
+        session_id=str(conversation.id),
+        user_id=str(db_user.id),
+    )
+    if is_pdf:
+        parse_kwargs["images"] = []
+        parse_kwargs["pdfs"] = media_bytes
+    else:
+        parse_kwargs["images"] = media_bytes
+
     try:
-        _, usage = await parser.parse(
-            images=images,
-            history=history,
-            new_text="Here is a receipt photo. Please parse it.",
-            on_tool_call=on_tool_call,
-            session_id=str(conversation.id),  # → Langfuse session_id + DB conversation key
-            user_id=str(db_user.id),          # → Langfuse user_id
-        )
+        _, usage = await parser.parse(**parse_kwargs)
         await conversation_repo.add_token_usage(
             session,
             conversation_id=conversation.id,
@@ -235,7 +253,7 @@ async def handle_photo(message: Message, session: AsyncSession, state: FSMContex
             _media_group_tasks.pop(group_id, None)
             if file_ids:
                 try:
-                    await _process_photos(message, file_ids, session, state, bot)
+                    await _process_receipt(message, file_ids, session, state, bot)
                 except Exception as exc:
                     logger.exception("Unhandled error processing media group %s: %s", group_id, exc)
                     from app.presentation.bot.bot import get_bot_manager
@@ -250,4 +268,4 @@ async def handle_photo(message: Message, session: AsyncSession, state: FSMContex
         task = asyncio.create_task(process_group())
         _media_group_tasks[group_id] = task
     else:
-        await _process_photos(message, [photo.file_id], session, state, bot)
+        await _process_receipt(message, [photo.file_id], session, state, bot)
