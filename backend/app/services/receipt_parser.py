@@ -10,7 +10,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from langfuse import LangfuseOtelSpanAttributes, observe
 from langfuse.openai import AsyncOpenAI
+from opentelemetry import trace as otel_trace
 
 from app.config import settings
 
@@ -210,22 +212,29 @@ def _load_system_prompt() -> str:
     return text
 
 
-def _encode_images(images: list[bytes]) -> list[dict]:
-    """Encode image bytes as base64 data URLs for the vision API."""
-    encoded = []
+def _encode_media(images: list[bytes], pdfs: list[bytes]) -> list[dict]:
+    """Encode images and PDFs as base64 data URLs for the Gemini vision API."""
+    parts: list[dict] = []
     for img_bytes in images:
         b64 = base64.b64encode(img_bytes).decode("utf-8")
-        encoded.append({
+        parts.append({
             "type": "image_url",
             "image_url": {"url": f"data:image/jpeg;base64,{b64}"},
         })
-    return encoded
+    for pdf_bytes in pdfs:
+        b64 = base64.b64encode(pdf_bytes).decode("utf-8")
+        parts.append({
+            "type": "image_url",
+            "image_url": {"url": f"data:application/pdf;base64,{b64}"},
+        })
+    return parts
 
 
 def _build_messages(
     history: list[dict],
     new_images: list[bytes],
     new_text: str | None,
+    new_pdfs: list[bytes] | None = None,
 ) -> list[dict]:
     """Build the full messages list for the Gemini API call."""
     messages: list[dict] = [{"role": "system", "content": _load_system_prompt()}]
@@ -234,8 +243,8 @@ def _build_messages(
     user_content: list[dict] = []
     if new_text:
         user_content.append({"type": "text", "text": new_text})
-    if new_images:
-        user_content.extend(_encode_images(new_images))
+    if new_images or new_pdfs:
+        user_content.extend(_encode_media(new_images, new_pdfs or []))
 
     if user_content:
         messages.append({"role": "user", "content": user_content})
@@ -252,6 +261,7 @@ class ReceiptParser:
             base_url=settings.gemini_base_url,
         )
 
+    @observe(name="receipt-parse")
     async def parse(
         self,
         images: list[bytes],
@@ -259,29 +269,34 @@ class ReceiptParser:
         new_text: str | None,
         on_tool_call: ToolCallback,
         *,
+        pdfs: list[bytes] | None = None,
         session_id: str | None = None,
         user_id: str | None = None,
     ) -> tuple[list[dict], TokenUsage]:
-        """Call Gemini with images + conversation history.
+        """Call Gemini with images/PDFs + conversation history.
 
         Tool results are dispatched to `on_tool_call(tool_name, args)`.
         Returns (updated_messages, token_usage) for the caller to persist.
 
+        pdfs:       PDF bytes to include alongside images (Gemini handles both natively).
         session_id: str(conversation.id) — used as Langfuse session_id and DB conversation key.
         user_id:    str(db_user.id)      — forwarded to Langfuse for per-user trace filtering.
         """
-        messages = _build_messages(history, images, new_text)
+        messages = _build_messages(history, images, new_text, new_pdfs=pdfs)
 
         full_content = ""
         tool_calls_by_idx: dict[int, dict] = {}
         usage = TokenUsage()
 
-        # Langfuse trace enrichment kwargs (silently ignored when Langfuse keys are absent)
-        langfuse_kwargs: dict = {"name": "receipt-parse"}
-        if session_id:
-            langfuse_kwargs["session_id"] = session_id
-        if user_id:
-            langfuse_kwargs["user_id"] = user_id
+        # Attach session / user to the Langfuse trace created by @observe.
+        # Uses OTEL span attributes (Langfuse 4.x native); silently skipped when
+        # no Langfuse exporter is active (span.is_recording() == False).
+        _span = otel_trace.get_current_span()
+        if _span.is_recording():
+            if session_id:
+                _span.set_attribute(LangfuseOtelSpanAttributes.TRACE_SESSION_ID, session_id)
+            if user_id:
+                _span.set_attribute(LangfuseOtelSpanAttributes.TRACE_USER_ID, user_id)
 
         stream = await self._client.chat.completions.create(
             model=settings.gemini_model,
@@ -290,7 +305,6 @@ class ReceiptParser:
             tool_choice="auto",
             stream=True,
             stream_options={"include_usage": True},
-            **langfuse_kwargs,
         )
 
         async for chunk in stream:
