@@ -5,6 +5,21 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [v1.1.1] — 2026-03-14
+
+### Changed
+- Rewrote `README.md` with a features overview, local development guide, and production deployment instructions
+
+---
+
+## [v1.1.0] — 2026-03-14
+
+### Changed
+- Enhanced system prompt loading in `receipt_parser.py` with improved handling logic
+- Added comprehensive `docs/system_prompt.md` documenting the AI prompt structure
+
+---
+
 ## [v1.0.3] — 2026-03-14
 
 ### Added
