@@ -1,11 +1,11 @@
-"""Receipt parsing service using Gemini Flash vision AI (ported from POC)."""
+"""Receipt parsing service."""
 
 from __future__ import annotations
 
 import base64
 import json
 import logging
-from collections.abc import AsyncIterator, Callable, Coroutine
+from collections.abc import Callable, Coroutine
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -18,7 +18,9 @@ from app.config import settings
 
 logger = logging.getLogger(__name__)
 
-SYSTEM_PROMPT_PATH = Path(__file__).resolve().parent.parent.parent.parent / "docs" / "system_prompt.md"
+SYSTEM_PROMPT_PATH = (
+    Path(__file__).resolve().parent.parent.parent / "docs" / "system_prompt.md"
+)
 
 
 @dataclass
@@ -38,6 +40,7 @@ class TokenUsage:
             output_tokens=self.output_tokens + other.output_tokens,
         )
 
+
 TOOLS: list[dict] = [
     {
         "type": "function",
@@ -53,7 +56,14 @@ TOOLS: list[dict] = [
                     "allow_skip": {"type": "boolean"},
                     "field": {
                         "type": "string",
-                        "enum": ["total", "date", "merchant", "category", "line_item", "edit_selection"],
+                        "enum": [
+                            "total",
+                            "date",
+                            "merchant",
+                            "category",
+                            "line_item",
+                            "edit_selection",
+                        ],
                     },
                 },
             },
@@ -87,14 +97,18 @@ TOOLS: list[dict] = [
                         "type": "array",
                         "items": {
                             "type": "object",
-                            "required": ["name", "amount"],
+                            "required": ["id", "name", "amount"],
                             "properties": {
+                                "id": {"type": "integer"},
                                 "name": {"type": "string"},
                                 "name_raw": {"type": "string"},
                                 "quantity": {"type": "integer", "default": 1},
                                 "unit_price": {"type": "integer"},
                                 "amount": {"type": "integer"},
-                                "confidence": {"type": "string", "enum": ["high", "medium", "low"]},
+                                "confidence": {
+                                    "type": "string",
+                                    "enum": ["high", "medium", "low"],
+                                },
                                 "toppings": {
                                     "type": "array",
                                     "items": {
@@ -117,7 +131,16 @@ TOOLS: list[dict] = [
                                     "type": "array",
                                     "items": {
                                         "type": "string",
-                                        "enum": ["sugary", "fried", "healthy", "alcohol", "caffeine", "dairy", "spicy", "non_food"],
+                                        "enum": [
+                                            "sugary",
+                                            "fried",
+                                            "healthy",
+                                            "alcohol",
+                                            "caffeine",
+                                            "dairy",
+                                            "spicy",
+                                            "non_food",
+                                        ],
                                     },
                                 },
                             },
@@ -131,11 +154,29 @@ TOOLS: list[dict] = [
                     "currency": {"type": "string", "default": "VND"},
                     "category": {
                         "type": "string",
-                        "enum": ["dining", "cafe", "grocery", "convenience", "health", "entertainment", "transport", "utilities", "rent", "other"],
+                        "enum": [
+                            "dining",
+                            "cafe",
+                            "grocery",
+                            "convenience",
+                            "health",
+                            "entertainment",
+                            "transport",
+                            "utilities",
+                            "rent",
+                            "other",
+                        ],
                     },
                     "source": {
                         "type": "string",
-                        "enum": ["paper", "shopeefood", "grabfood", "gofood", "baemin", "app_unknown"],
+                        "enum": [
+                            "paper",
+                            "shopeefood",
+                            "grabfood",
+                            "gofood",
+                            "baemin",
+                            "app_unknown",
+                        ],
                         "default": "paper",
                     },
                     "notes": {"type": "string"},
@@ -198,17 +239,8 @@ ToolCallback = Callable[[str, dict], Coroutine[Any, Any, str]]
 
 
 def _load_system_prompt() -> str:
-    try:
-        text = SYSTEM_PROMPT_PATH.read_text(encoding="utf-8")
-    except FileNotFoundError:
-        text = "You are Receipt Pal, a Vietnamese receipt-parsing assistant on Telegram."
-
-    text += (
-        "\n\n---\n\n"
-        "NOTE: The user is interacting via Telegram. Use inline keyboard buttons via AskUser.\n"
-        "IMPORTANT: Only call ONE tool per response. Do not chain tools in a single turn.\n"
-        "EDIT FLOW: SubmitReceipt(draft) → user correction → UpdateReceipt(patch) → repeat → SubmitReceipt(final)."
-    )
+    text = SYSTEM_PROMPT_PATH.read_text(encoding="utf-8")
+    logger.info("Loaded system prompt from %s", SYSTEM_PROMPT_PATH)
     return text
 
 
@@ -217,16 +249,20 @@ def _encode_media(images: list[bytes], pdfs: list[bytes]) -> list[dict]:
     parts: list[dict] = []
     for img_bytes in images:
         b64 = base64.b64encode(img_bytes).decode("utf-8")
-        parts.append({
-            "type": "image_url",
-            "image_url": {"url": f"data:image/jpeg;base64,{b64}"},
-        })
+        parts.append(
+            {
+                "type": "image_url",
+                "image_url": {"url": f"data:image/jpeg;base64,{b64}"},
+            }
+        )
     for pdf_bytes in pdfs:
         b64 = base64.b64encode(pdf_bytes).decode("utf-8")
-        parts.append({
-            "type": "image_url",
-            "image_url": {"url": f"data:application/pdf;base64,{b64}"},
-        })
+        parts.append(
+            {
+                "type": "image_url",
+                "image_url": {"url": f"data:application/pdf;base64,{b64}"},
+            }
+        )
     return parts
 
 
@@ -294,7 +330,9 @@ class ReceiptParser:
         _span = otel_trace.get_current_span()
         if _span.is_recording():
             if session_id:
-                _span.set_attribute(LangfuseOtelSpanAttributes.TRACE_SESSION_ID, session_id)
+                _span.set_attribute(
+                    LangfuseOtelSpanAttributes.TRACE_SESSION_ID, session_id
+                )
             if user_id:
                 _span.set_attribute(LangfuseOtelSpanAttributes.TRACE_USER_ID, user_id)
 
@@ -324,7 +362,8 @@ class ReceiptParser:
 
             raw_chunk = chunk.model_dump()
             raw_tool_calls = (
-                raw_chunk.get("choices", [{}])[0].get("delta", {}).get("tool_calls") or []
+                raw_chunk.get("choices", [{}])[0].get("delta", {}).get("tool_calls")
+                or []
             )
             for tc_raw in raw_tool_calls:
                 idx = tc_raw.get("index", 0)
@@ -361,17 +400,21 @@ class ReceiptParser:
             fn_name = tc["function"]["name"]
             raw_args = tc["function"]["arguments"]
             try:
-                fn_args = json.loads(raw_args) if isinstance(raw_args, str) else raw_args
+                fn_args = (
+                    json.loads(raw_args) if isinstance(raw_args, str) else raw_args
+                )
             except json.JSONDecodeError:
                 fn_args = {}
 
             result = await on_tool_call(fn_name, fn_args)
 
-            messages.append({
-                "role": "tool",
-                "tool_call_id": tc["id"],
-                "content": result,
-            })
+            messages.append(
+                {
+                    "role": "tool",
+                    "tool_call_id": tc["id"],
+                    "content": result,
+                }
+            )
 
         return messages, usage
 
