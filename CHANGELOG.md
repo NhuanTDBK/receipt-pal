@@ -5,6 +5,34 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [v2.0.0] — 2026-03-20
+
+### Added
+- **OpenAI Agents SDK** — replaces raw OpenAI client; typed `@function_tool` implementations with Pydantic schemas eliminate ~200 lines of manual JSON tool definitions
+- **`SQLAlchemySession`** for automatic conversation history persistence; removes manual `_build_gemini_history()` and `conversation_repo.load_history()` calls
+- **Memory tool** (`set_memory`) — agent persists free-text user notes across sessions, stored in new `memories` table
+- **Settings tool** (`update_settings`) — agent silently infers and persists language, response style, and location preferences
+- **`UserSettings` model** — per-user language, response_preference, location; injected as static instructions header at session start
+- **`/settings` command** — users can view their current preferences
+- New DB models: `UserSettings`, `Memory`
+- New repositories: `user_settings_repo`, `memory_repo`
+- Alembic migration `b2c3d4e5f6a7`: adds `user_settings` and `memories` tables
+- `TelegramAgentContext` dataclass for typed tool access to bot handles and session state
+- `agent_runner.py` service orchestrating `Runner.run()` with session management and token tracking
+- `OPENAI_AGENTS_DISABLE_TRACING=1` env var in Terraform to suppress SDK tracing noise
+
+### Changed
+- `ReceiptParser` replaced by typed `@function_tool` implementations (`ask_user`, `submit_receipt_draft/final`, `update_receipt`)
+- Config: `gemini_api_key` → `openai_api_key`, `gemini_base_url` → `openai_base_url` (backward-compat aliases maintained)
+- Photo and callback handlers simplified — delegate to `run_agent()` instead of managing `on_tool_call` closures
+- `/start` command now ensures `UserSettings` row exists for new users
+- System prompt extended with Memory and Settings sections
+
+### Removed
+- `receipt_parser.py` — 447 lines of manual streaming loop, JSON tool schemas, and tool dispatch
+
+---
+
 ## [v1.1.1] — 2026-03-14
 
 ### Changed
