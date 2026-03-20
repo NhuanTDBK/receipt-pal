@@ -1,8 +1,8 @@
 """Agent factory for the Receipt-Pal Telegram bot.
 
 Provides:
-    configure_provider()          — Call once at startup; configures SDK for Gemini.
-    build_receipt_agent(settings) — Returns the receipt parser agent with settings-aware instructions.
+    configure_provider()          — configures SDK for Gemini.
+    build_receipt_agent(settings) — parser agent with settings.
 """
 
 from __future__ import annotations
@@ -51,7 +51,8 @@ def _build_settings_header(user_settings) -> str:
     """Build the ## Current Settings block prepended to instructions."""
     lines = [
         "## Current Settings",
-        f"- Language: {user_settings.language} — respond in this language for all replies",
+        f"- Language: {user_settings.language} "
+        "— respond in this language for all replies",
         f"- Response style: {user_settings.response_preference}",
     ]
     if user_settings.location:
@@ -89,7 +90,8 @@ def build_receipt_agent(user_settings=None) -> Agent[TelegramAgentContext]:
     base_prompt = _PARSER_PROMPT_PATH.read_text(encoding="utf-8")
 
     if user_settings is not None:
-        instructions = _build_settings_header(user_settings) + base_prompt + _TELEGRAM_NOTE
+        header = _build_settings_header(user_settings)
+        instructions = header + base_prompt + _TELEGRAM_NOTE
     else:
         instructions = base_prompt + _TELEGRAM_NOTE
 

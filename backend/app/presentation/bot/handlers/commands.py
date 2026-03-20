@@ -12,7 +12,12 @@ from app.presentation.bot.formatters.receipt_formatter import (
     format_currency,
     format_history_item,
 )
-from app.repositories import conversation_repo, receipt_repo, user_repo, user_settings_repo
+from app.repositories import (
+    conversation_repo,
+    receipt_repo,
+    user_repo,
+    user_settings_repo,
+)
 
 router = Router(name="commands")
 
@@ -137,7 +142,10 @@ async def cmd_usage(message: Message, session: AsyncSession) -> None:
     stats = await conversation_repo.get_usage_stats(session, db_user.id)
 
     if stats["total_tokens"] == 0:
-        await message.answer("No token usage yet. Send a receipt photo or PDF to get started! 📸")
+        await message.answer(
+            "No token usage yet. Send a receipt photo or PDF "
+            "to get started! 📸"
+        )
         return
 
     def fmt(n: int) -> str:

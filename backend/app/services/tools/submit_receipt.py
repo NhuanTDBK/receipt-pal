@@ -2,19 +2,16 @@
 
 from __future__ import annotations
 
-import uuid
 from typing import Literal
 
-from pydantic import BaseModel
-
 from agents import RunContextWrapper, function_tool
+from pydantic import BaseModel
 
 from app.presentation.bot.formatters.receipt_formatter import format_receipt_card
 from app.presentation.bot.keyboards.receipt import receipt_review_keyboard
 from app.presentation.bot.states import ReceiptFlow
 from app.repositories import receipt_repo
 from app.services.agent_context import TelegramAgentContext
-
 
 # ---------------------------------------------------------------------------
 # Pydantic models for structured receipt data

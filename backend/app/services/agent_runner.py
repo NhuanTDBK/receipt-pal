@@ -4,11 +4,9 @@ from __future__ import annotations
 
 import base64
 import logging
-import uuid
 
 from agents import Runner
 from agents.extensions.memory.sqlalchemy_session import SQLAlchemySession
-
 from aiogram import Bot
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
@@ -111,10 +109,14 @@ async def run_agent(
         first_name=tg_user.first_name or "Friend",
     )
 
-    conversation = await conversation_repo.get_active_conversation(db_session, db_user.id)
+    conversation = await conversation_repo.get_active_conversation(
+        db_session, db_user.id
+    )
     await db_session.commit()
 
-    user_settings = await user_settings_repo.get_or_create_settings(db_session, db_user.id)
+    user_settings = await user_settings_repo.get_or_create_settings(
+        db_session, db_user.id
+    )
 
     agent = build_receipt_agent(user_settings)
 
@@ -151,8 +153,16 @@ async def run_agent(
             for resp in result.raw_responses:
                 usage = getattr(resp, "usage", None)
                 if usage:
-                    total_input += getattr(usage, "input_tokens", 0) or getattr(usage, "prompt_tokens", 0) or 0
-                    total_output += getattr(usage, "completion_tokens", 0) or getattr(usage, "output_tokens", 0) or 0
+                    total_input += (
+                        getattr(usage, "input_tokens", 0)
+                        or getattr(usage, "prompt_tokens", 0)
+                        or 0
+                    )
+                    total_output += (
+                        getattr(usage, "completion_tokens", 0)
+                        or getattr(usage, "output_tokens", 0)
+                        or 0
+                    )
 
             if total_input or total_output:
                 await conversation_repo.add_token_usage(

@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.presentation.bot.formatters.receipt_formatter import format_receipt_card
 from app.presentation.bot.states import ReceiptFlow
-from app.repositories import conversation_repo, receipt_repo
+from app.repositories import receipt_repo
 from app.services.agent_runner import run_agent
 
 logger = logging.getLogger(__name__)
@@ -34,7 +34,7 @@ async def callback_confirm(
         await state.clear()
         return
 
-    receipt = await receipt_repo.save_receipt(
+    await receipt_repo.save_receipt(
         session,
         user_id=uuid.UUID(user_id),
         conversation_id=uuid.UUID(conversation_id) if conversation_id else None,
@@ -59,7 +59,8 @@ async def callback_edit(
 
     await state.set_state(ReceiptFlow.EDITING_FIELD)
     await callback.message.answer(
-        "✏️ Describe what to change (e.g. \"merchant is Starbucks\" or \"total is 55000\"):"
+        "✏️ Describe what to change "
+        "(e.g. \"merchant is Starbucks\" or \"total is 55000\"):"
     )
 
 
@@ -81,7 +82,9 @@ async def callback_ask_user(
 
     await callback.message.edit_reply_markup(reply_markup=None)
 
-    status_msg = await callback.message.answer(f"You selected: <b>{selected_text}</b>\n\n🔄 Processing...")
+    status_msg = await callback.message.answer(
+        f"You selected: <b>{selected_text}</b>\n\n🔄 Processing..."
+    )
 
     await run_agent(
         bot, callback.message, status_msg, session, state,

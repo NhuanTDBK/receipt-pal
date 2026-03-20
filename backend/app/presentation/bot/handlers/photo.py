@@ -1,4 +1,4 @@
-"""Photo handler — core receipt parsing flow with multi-image and conversation support."""
+"""Photo handler — receipt parsing flow with multi-image support."""
 
 from __future__ import annotations
 
@@ -33,7 +33,11 @@ async def _get_or_download_image(bot: Bot, file_id: str) -> bytes | None:
     try:
         file = await bot.get_file(file_id)
         image_bytes = await bot.download_file(file.file_path)
-        data = image_bytes.read() if hasattr(image_bytes, "read") else bytes(image_bytes)
+        data = (
+            image_bytes.read()
+            if hasattr(image_bytes, "read")
+            else bytes(image_bytes)
+        )
         photo_store.store(file_id, data)
         return data
     except Exception as exc:
@@ -82,7 +86,12 @@ async def _process_receipt(
 
 
 @router.message(F.photo)
-async def handle_photo(message: Message, session: AsyncSession, state: FSMContext, bot: Bot) -> None:
+async def handle_photo(
+    message: Message,
+    session: AsyncSession,
+    state: FSMContext,
+    bot: Bot,
+) -> None:
     photo = message.photo[-1]  # highest resolution
 
     if message.media_group_id:
@@ -107,7 +116,11 @@ async def handle_photo(message: Message, session: AsyncSession, state: FSMContex
                 try:
                     await _process_receipt(message, file_ids, session, state, bot)
                 except Exception as exc:
-                    logger.exception("Unhandled error processing media group %s: %s", group_id, exc)
+                    logger.exception(
+                        "Unhandled error processing media group %s: %s",
+                        group_id,
+                        exc,
+                    )
                     from app.presentation.bot.bot import get_bot_manager
                     try:
                         await get_bot_manager().send_message(
@@ -115,7 +128,10 @@ async def handle_photo(message: Message, session: AsyncSession, state: FSMContex
                             text="⚠️ Failed to process your photos. Please try again.",
                         )
                     except Exception:
-                        logger.error("Failed to send error notification to %s", message.chat.id)
+                        logger.error(
+                            "Failed to send error notification to %s",
+                            message.chat.id,
+                        )
 
         task = asyncio.create_task(process_group())
         _media_group_tasks[group_id] = task

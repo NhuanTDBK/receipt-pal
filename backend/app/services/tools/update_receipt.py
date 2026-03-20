@@ -4,9 +4,8 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel
-
 from agents import RunContextWrapper, function_tool
+from pydantic import BaseModel
 
 from app.presentation.bot.formatters.receipt_formatter import format_receipt_card
 from app.presentation.bot.keyboards.receipt import receipt_review_keyboard
