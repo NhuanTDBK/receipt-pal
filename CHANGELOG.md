@@ -5,6 +5,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [v2.0.1] — 2026-03-20
+
+### Fixed
+- **Plain-text messages silently dropped** — added `StateFilter(None)` fallback handler that routes free-text messages (e.g. "change to Vietnamese") to the agent when no FSM state is active. Previously these produced `"Update is not handled"` warnings and were ignored.
+- Router registration order corrected: callbacks and media handlers registered before commands so the fallback cannot shadow specific handlers.
+
+---
+
 ## [v2.0.0] — 2026-03-20
 
 ### Added
