@@ -51,13 +51,14 @@ def _score(entry: dict[str, str], terms: list[str]) -> int:
 async def answer_faq(
     ctx: RunContextWrapper[TelegramAgentContext],
     question: Annotated[str, "The user's product or feature question"],
+    limit: Annotated[int, "Maximum number of FAQ entries to return (1–10)"] = 10,
 ) -> str:
     """Look up a question in the Receipt-Pal FAQ corpus.
 
     Use this tool when the user asks about how Receipt-Pal works, what
     categories are supported, how data is stored, or any general product
     question that does not require querying their receipt history.
-    Returns the best-matching FAQ entry or a 'not found' message.
+    Returns up to ``limit`` matching FAQ entries for the agent to synthesise.
     """
     corpus = _load_corpus()
     if not corpus:
@@ -71,14 +72,18 @@ async def answer_faq(
     if not terms:
         return "Please provide a more specific question."
 
+    limit = max(1, min(limit, 10))
     scored = [(entry, _score(entry, terms)) for entry in entries]
     scored.sort(key=lambda x: x[1], reverse=True)
 
-    best_entry, best_score = scored[0]
-    if best_score == 0:
+    matches = [(entry, score) for entry, score in scored[:limit] if score > 0]
+    if not matches:
         return (
             "No FAQ entry matched your question. "
             "Try rephrasing or ask me to query your receipt data directly."
         )
 
-    return f"**Q: {best_entry['question']}**\n\n{best_entry['answer']}"
+    return "\n\n---\n\n".join(
+        f"**Q: {entry['question']}**\n\n{entry['answer']}"
+        for entry, _ in matches
+    )
