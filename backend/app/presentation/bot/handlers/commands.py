@@ -1,11 +1,15 @@
-"""Command handlers: /start, /help, /history, /stats, /settings."""
+"""Command handlers: /start, /help, /history, /stats, /settings, and text fallback."""
 
 from __future__ import annotations
 
-from aiogram import Router
+from aiogram import Bot, Router
 from aiogram.filters import Command, CommandStart
+from aiogram.filters.state import StateFilter
+from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.services.agent_runner import run_agent
 
 from app.presentation.bot.formatters.receipt_formatter import (
     CATEGORY_EMOJI,
@@ -182,3 +186,25 @@ async def cmd_settings(message: Message, session: AsyncSession) -> None:
         "<i>Changes take effect on the next session.</i>",
     ]
     await message.answer("\n".join(lines))
+
+
+@router.message(StateFilter(None))
+async def fallback_text(
+    message: Message, session: AsyncSession, state: FSMContext, bot: Bot
+) -> None:
+    """Route plain-text messages (no active FSM state) to the agent.
+
+    Handles natural-language requests like "change language to Vietnamese",
+    "what's my spending this month?", or general questions.
+    """
+    if not message.text:
+        await message.answer(
+            "📸 Send me a photo or PDF of a receipt to get started!"
+        )
+        return
+
+    status_msg = await message.answer("🤔 Processing...")
+    await run_agent(
+        bot, message, status_msg, session, state,
+        user_input=message.text,
+    )
