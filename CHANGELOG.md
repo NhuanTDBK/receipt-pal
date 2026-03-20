@@ -5,6 +5,23 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [v2.1.0] — 2026-03-20
+
+### Added
+- **Analytics tools** — users can now ask spending questions in natural language directly in Telegram chat:
+  - `search_receipts` — keyword / category search across receipts and line items
+  - `run_query` — open-ended analytics via LLM-generated SQLAlchemy queries executed in a sandboxed read-only namespace (`AsyncSession.run_sync()`)
+  - `answer_faq` — product/feature questions answered from a static corpus
+- **`docs/faq.md`** — shared FAQ corpus (24 entries) covering all production features: PDF support, text parsing, memory, settings, delivery platforms, analytics tools, bot commands, and more
+- **`backend/app/prompts/analytics_instructions.md`** — analytics tool-selection rules and SQLAlchemy query patterns injected into agent system prompt
+
+### Changed
+- Agent renamed from `Receipt-Pal Parser` → `Receipt-Pal` to reflect combined parsing + analytics capability
+- Agent tool list expanded from 6 → 9 tools (added `search_receipts`, `run_query`, `answer_faq`)
+- POC `answer_faq` updated to reference shared `docs/faq.md`
+
+---
+
 ## [v2.0.1] — 2026-03-20
 
 ### Fixed
