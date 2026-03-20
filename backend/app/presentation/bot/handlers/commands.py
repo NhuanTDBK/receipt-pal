@@ -1,4 +1,4 @@
-"""Command handlers: /start, /help, /history, /stats."""
+"""Command handlers: /start, /help, /history, /stats, /settings."""
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ from app.presentation.bot.formatters.receipt_formatter import (
     format_currency,
     format_history_item,
 )
-from app.repositories import conversation_repo, receipt_repo, user_repo
+from app.repositories import conversation_repo, receipt_repo, user_repo, user_settings_repo
 
 router = Router(name="commands")
 
@@ -24,6 +24,7 @@ WELCOME_MESSAGE = (
     "/history — your last 10 receipts\n"
     "/stats — spending by category\n"
     "/usage — token usage stats\n"
+    "/settings — your preferences\n"
     "/help — show this message"
 )
 
@@ -40,6 +41,7 @@ HELP_MESSAGE = (
     "/history — last 10 saved receipts\n"
     "/stats — spending totals by category\n"
     "/usage — token usage stats\n"
+    "/settings — your preferences\n"
     "/help — this message"
 )
 
@@ -47,12 +49,14 @@ HELP_MESSAGE = (
 @router.message(CommandStart())
 async def cmd_start(message: Message, session: AsyncSession) -> None:
     user = message.from_user
-    await user_repo.get_or_create_user(
+    db_user = await user_repo.get_or_create_user(
         session,
         telegram_id=user.id,
         username=user.username,
         first_name=user.first_name or "Friend",
     )
+    # Ensure settings row exists for this user
+    await user_settings_repo.get_or_create_settings(session, db_user.id)
     await message.answer(WELCOME_MESSAGE)
 
 
@@ -146,5 +150,27 @@ async def cmd_usage(message: Message, session: AsyncSession) -> None:
         "─────────────────────",
         f"Total tokens:   <b>{fmt(stats['total_tokens'])}</b>",
         f"\nAcross <b>{stats['conversation_count']}</b> conversation(s)",
+    ]
+    await message.answer("\n".join(lines))
+
+
+@router.message(Command("settings"))
+async def cmd_settings(message: Message, session: AsyncSession) -> None:
+    user = message.from_user
+    db_user = await user_repo.get_or_create_user(
+        session,
+        telegram_id=user.id,
+        username=user.username,
+        first_name=user.first_name or "Friend",
+    )
+    settings = await user_settings_repo.get_or_create_settings(session, db_user.id)
+
+    lines = [
+        "⚙️ <b>Your Settings</b>\n",
+        f"🌐 Language: <b>{settings.language}</b>",
+        f"💬 Style: <b>{settings.response_preference}</b>",
+        f"📍 Location: <b>{settings.location or 'not set'}</b>",
+        "\n<i>The bot auto-detects your preferences from conversations.</i>",
+        "<i>Changes take effect on the next session.</i>",
     ]
     await message.answer("\n".join(lines))
