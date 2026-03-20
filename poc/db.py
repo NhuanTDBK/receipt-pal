@@ -16,7 +16,7 @@ from pathlib import Path
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker, Session
 
-from models import Base, Receipt, ReceiptItem
+from models import Base, Receipt, ReceiptItem, UserSettings
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 RECEIPTS_DIR = PROJECT_ROOT / "data" / "receipts"
@@ -35,6 +35,22 @@ def init_db(user_id: uuid.UUID, db_path: Path = DB_PATH) -> sessionmaker[Session
 
     _ingest_receipts(factory, user_id)
     return factory
+
+
+def load_or_create_settings(
+    factory: sessionmaker[Session], user_id: uuid.UUID
+) -> UserSettings:
+    """Return the UserSettings row for this user, creating defaults if absent."""
+    with factory() as session:
+        settings = session.get(UserSettings, str(user_id))
+        if settings is None:
+            settings = UserSettings(user_id=str(user_id))
+            session.add(settings)
+            session.commit()
+            session.refresh(settings)
+        # Expunge so the object can be used outside the session
+        session.expunge(settings)
+    return settings
 
 
 def _ingest_receipts(factory: sessionmaker[Session], user_id: uuid.UUID) -> int:
@@ -61,7 +77,7 @@ def _ingest_receipts(factory: sessionmaker[Session], user_id: uuid.UUID) -> int:
                     Receipt.merchant_name == merchant,
                     Receipt.receipt_datetime == dt,
                 )
-            ).scalar_one_or_none()
+            ).first()
             if existing:
                 continue
 

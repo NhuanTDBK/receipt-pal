@@ -46,6 +46,7 @@ locals {
   EOT
 
   ssh_opts = "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p ${var.vps_ssh_port} -i ${pathexpand(var.ssh_private_key_path)}"
+  rsync_ssh = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p ${var.vps_ssh_port} -i ${pathexpand(var.ssh_private_key_path)}"
 }
 
 # ── 1. Sync source code to the VPS ───────────────────────────────────────────
@@ -72,7 +73,7 @@ resource "null_resource" "sync_source" {
   # Rsync docker-compose.yml
   provisioner "local-exec" {
     command = <<-EOT
-      rsync -az ${local.ssh_opts} \
+      rsync -az -e "${local.rsync_ssh}" \
         ${local.repo_root}/docker-compose.yml \
         ${var.vps_user}@${var.vps_host}:${var.app_dir}/
     EOT
@@ -89,7 +90,7 @@ resource "null_resource" "sync_source" {
         --exclude='*.egg-info/' \
         --exclude='.pytest_cache/' \
         --exclude='dist/' \
-        ${local.ssh_opts} \
+        -e "${local.rsync_ssh}" \
         ${local.repo_root}/backend/ \
         ${var.vps_user}@${var.vps_host}:${var.app_dir}/backend/
     EOT

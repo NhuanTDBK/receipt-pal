@@ -27,7 +27,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 load_dotenv()
 
-from agents import Runner, set_tracing_disabled
+from agents import Runner
 from agents.stream_events import RawResponsesStreamEvent, RunItemStreamEvent, AgentUpdatedStreamEvent
 from agents.items import (
     MessageOutputItem,
@@ -36,7 +36,7 @@ from agents.items import (
     ToolCallOutputItem,
 )
 
-from agent import build_agent
+from agent import build_agent, configure_provider
 from context import ReceiptPalContext
 from db import init_db
 
@@ -62,16 +62,7 @@ def _resolve_user_id() -> uuid.UUID:
 
 
 def _validate_env() -> None:
-    has_openai = bool(os.environ.get("OPENAI_API_KEY"))
-    has_gemini = bool(os.environ.get("GEMINI_API_KEY"))
-    if not has_openai and not has_gemini:
-        print("Error: set OPENAI_API_KEY or GEMINI_API_KEY in your .env file.")
-        sys.exit(1)
-    # Tracing sends traces to OpenAI's platform using the default API key.
-    # When running on Gemini, that key is rejected with a noisy 401 error.
-    # Disable tracing entirely when only a Gemini key is present.
-    if not has_openai and has_gemini:
-        set_tracing_disabled(True)
+    configure_provider()
 
 
 def _banner(user_id: uuid.UUID, receipt_count: int) -> None:
@@ -237,7 +228,7 @@ async def chat_loop() -> None:
 
     while True:
         try:
-            user_input = input("  You: ").strip()
+            user_input = (await asyncio.to_thread(input, "  You: ")).strip()
         except (EOFError, KeyboardInterrupt):
             print("\n  Goodbye!")
             break
