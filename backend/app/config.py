@@ -4,7 +4,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_file=".env", env_file_encoding="utf-8", extra="ignore"
+    )
 
     # Telegram
     telegram_bot_token: str
@@ -12,13 +14,18 @@ class Settings(BaseSettings):
     # Database
     database_url: str  # postgresql+asyncpg://user:pass@host/db
 
-    # Gemini / OpenAI-compatible — accepts GEMINI_MODEL or MODEL env var
-    gemini_api_key: str
-    gemini_model: str = Field(
-        default="gemini-2.0-flash-lite",
-        validation_alias=AliasChoices("gemini_model", "model"),
+    # OpenAI-compatible LLM provider
+    openai_api_key: str = Field(
+        validation_alias=AliasChoices("openai_api_key", "gemini_api_key"),
     )
-    gemini_base_url: str = "https://generativelanguage.googleapis.com/v1beta/openai/"
+    openai_base_url: str = Field(
+        default="https://generativelanguage.googleapis.com/v1beta/openai/",
+        validation_alias=AliasChoices("openai_base_url", "gemini_base_url"),
+    )
+    model: str = Field(
+        default="gemini-2.0-flash-lite",
+        validation_alias=AliasChoices("model", "gemini_model"),
+    )
 
     # RocksDB
     rocksdb_path: str = "./data/rocksdb"
