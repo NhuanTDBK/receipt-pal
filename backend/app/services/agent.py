@@ -2,7 +2,7 @@
 
 Provides:
     configure_provider()          — configures SDK for Gemini.
-    build_receipt_agent(settings) — parser agent with settings.
+    build_receipt_agent(settings) — parser + analytics agent with settings.
 """
 
 from __future__ import annotations
@@ -16,7 +16,10 @@ from agents import Agent, set_default_openai_api, set_tracing_disabled
 from app.config import settings as app_settings
 from app.services.agent_context import TelegramAgentContext
 from app.services.tools import (
+    answer_faq,
     ask_user,
+    run_query,
+    search_receipts,
     set_memory,
     submit_receipt_draft,
     submit_receipt_final,
@@ -28,6 +31,9 @@ logger = logging.getLogger(__name__)
 
 _PARSER_PROMPT_PATH = (
     Path(__file__).resolve().parent.parent.parent / "docs" / "system_prompt.md"
+)
+_ANALYTICS_PROMPT_PATH = (
+    Path(__file__).resolve().parent.parent / "prompts" / "analytics_instructions.md"
 )
 
 _TELEGRAM_NOTE = (
@@ -81,22 +87,23 @@ def configure_provider() -> None:
 
 
 def build_receipt_agent(user_settings=None) -> Agent[TelegramAgentContext]:
-    """Return the fully-configured receipt parser agent.
+    """Return the fully-configured receipt + analytics agent.
 
     Args:
         user_settings: UserSettings ORM instance. If provided, settings are
                        injected into the static instructions header.
     """
     base_prompt = _PARSER_PROMPT_PATH.read_text(encoding="utf-8")
+    analytics_prompt = _ANALYTICS_PROMPT_PATH.read_text(encoding="utf-8")
 
     if user_settings is not None:
         header = _build_settings_header(user_settings)
-        instructions = header + base_prompt + _TELEGRAM_NOTE
+        instructions = header + base_prompt + _TELEGRAM_NOTE + "\n\n" + analytics_prompt
     else:
-        instructions = base_prompt + _TELEGRAM_NOTE
+        instructions = base_prompt + _TELEGRAM_NOTE + "\n\n" + analytics_prompt
 
     return Agent[TelegramAgentContext](
-        name="Receipt-Pal Parser",
+        name="Receipt-Pal",
         instructions=instructions,
         model=app_settings.model,
         tools=[
@@ -106,5 +113,8 @@ def build_receipt_agent(user_settings=None) -> Agent[TelegramAgentContext]:
             update_receipt,
             set_memory,
             update_settings,
+            search_receipts,
+            run_query,
+            answer_faq,
         ],
     )
