@@ -5,6 +5,16 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [v2.1.1] — 2026-03-21
+
+### Fixed
+- **Receipt/PDF photos failed to parse** — `_build_input()` was returning a flat list of content-part dicts (`{"type": "text", ...}`, `{"type": "image_url", ...}`) which the `openai-agents` SDK rejected with `UserError: Unhandled item type or structure`. Content parts are now wrapped in a valid `EasyInputMessageParam` (`{"role": "user", "content": [...]}`) before being passed to `Runner.run()`.
+
+### Changed
+- **Deploy script** (`infra/terraform/scripts/deploy-receipt-pal.sh`) — now runs `git fetch --tags origin main` before deploying and accepts an optional `TAG` argument to pin a specific release; defaults to the latest semver tag reachable from `main`.
+
+---
+
 ## [v2.1.0] — 2026-03-20
 
 ### Added
