@@ -34,9 +34,12 @@ async def update_settings(
         response_preference=response_preference,
         location=location,
     )
-    return json.dumps({
-        "language": settings.language,
-        "response_preference": settings.response_preference,
-        "location": settings.location,
-        "note": "Settings saved. They will be applied from the next session.",
-    }, ensure_ascii=False)
+    return json.dumps(
+        {
+            "language": settings.language,
+            "response_preference": settings.response_preference,
+            "location": settings.location,
+            "note": "Settings saved. They will be applied from the next session.",
+        },
+        ensure_ascii=False,
+    )

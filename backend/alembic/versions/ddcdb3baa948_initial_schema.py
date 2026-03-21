@@ -1,10 +1,11 @@
 """initial schema
 
 Revision ID: ddcdb3baa948
-Revises: 
+Revises:
 Create Date: 2026-03-12 15:36:29.324446
 
 """
+
 from typing import Sequence, Union
 
 import sqlalchemy as sa
@@ -24,7 +25,9 @@ def upgrade() -> None:
         sa.Column("telegram_id", sa.BigInteger(), nullable=False, unique=True),
         sa.Column("username", sa.String(255), nullable=True),
         sa.Column("first_name", sa.String(255), nullable=False),
-        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
+        sa.Column(
+            "created_at", sa.DateTime(timezone=True), server_default=sa.func.now()
+        ),
         sa.Column(
             "updated_at",
             sa.DateTime(timezone=True),
@@ -43,8 +46,12 @@ def upgrade() -> None:
             sa.ForeignKey("users.id", ondelete="CASCADE"),
             nullable=False,
         ),
-        sa.Column("started_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
-        sa.Column("last_message_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
+        sa.Column(
+            "started_at", sa.DateTime(timezone=True), server_default=sa.func.now()
+        ),
+        sa.Column(
+            "last_message_at", sa.DateTime(timezone=True), server_default=sa.func.now()
+        ),
         sa.Column("is_active", sa.Boolean(), nullable=False, default=True),
     )
     op.create_index("ix_conversations_user_id", "conversations", ["user_id"])
@@ -63,7 +70,9 @@ def upgrade() -> None:
         sa.Column("image_file_ids", JSONB(), nullable=True),
         sa.Column("tool_name", sa.String(100), nullable=True),
         sa.Column("tool_args", JSONB(), nullable=True),
-        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
+        sa.Column(
+            "created_at", sa.DateTime(timezone=True), server_default=sa.func.now()
+        ),
     )
     op.create_index(
         "ix_conversation_messages_conversation_id",
@@ -99,7 +108,9 @@ def upgrade() -> None:
         sa.Column("total", sa.Integer(), nullable=False),
         sa.Column("currency", sa.String(10), nullable=False, server_default="VND"),
         sa.Column("notes", sa.Text(), nullable=True),
-        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
+        sa.Column(
+            "created_at", sa.DateTime(timezone=True), server_default=sa.func.now()
+        ),
     )
     op.create_index("ix_receipts_user_id", "receipts", ["user_id"])
 
@@ -131,4 +142,3 @@ def downgrade() -> None:
     op.drop_table("conversation_messages")
     op.drop_table("conversations")
     op.drop_table("users")
-

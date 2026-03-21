@@ -94,7 +94,9 @@ class BotManager:
 
                 return RedisStorage.from_url(settings.redis_url)
             except Exception as exc:
-                logger.warning("Redis unavailable, falling back to MemoryStorage: %s", exc)
+                logger.warning(
+                    "Redis unavailable, falling back to MemoryStorage: %s", exc
+                )
         return MemoryStorage()
 
     def _setup_middleware(self) -> None:
@@ -113,7 +115,9 @@ class BotManager:
         self._dp.include_router(callbacks_router)
         self._dp.include_router(photo_router)
         self._dp.include_router(document_router)
-        self._dp.include_router(commands_router)  # fallback_text is here (StateFilter(None))
+        self._dp.include_router(
+            commands_router
+        )  # fallback_text is here (StateFilter(None))
 
     async def send_message(
         self,
@@ -147,7 +151,9 @@ class BotManager:
                     reply_markup=reply_markup,
                     parse_mode=parse_mode or ParseMode.HTML,
                 )
-                logger.debug("Sent message to %s: msg_id=%s", chat_id, message.message_id)
+                logger.debug(
+                    "Sent message to %s: msg_id=%s", chat_id, message.message_id
+                )
                 return {
                     "message_id": message.message_id,
                     "chat_id": message.chat.id,
@@ -158,13 +164,18 @@ class BotManager:
                 if attempt >= max_attempts:
                     logger.error(
                         "Rate limited sending to %s after %d attempts: %s",
-                        chat_id, attempt, exc,
+                        chat_id,
+                        attempt,
+                        exc,
                     )
                     raise
                 delay = max(float(exc.retry_after), base_delay)
                 logger.warning(
                     "Rate limited sending to %s; retrying in %.1fs (attempt %d/%d)",
-                    chat_id, delay, attempt, max_attempts,
+                    chat_id,
+                    delay,
+                    attempt,
+                    max_attempts,
                 )
                 await asyncio.sleep(delay)
 
@@ -172,13 +183,19 @@ class BotManager:
                 if attempt >= max_attempts:
                     logger.error(
                         "Network error sending to %s after %d attempts: %s",
-                        chat_id, attempt, exc,
+                        chat_id,
+                        attempt,
+                        exc,
                     )
                     raise
                 delay = base_delay * (2 ** (attempt - 1))
                 logger.warning(
                     "Network error sending to %s; retrying in %.1fs (attempt %d/%d): %s",
-                    chat_id, delay, attempt, max_attempts, exc,
+                    chat_id,
+                    delay,
+                    attempt,
+                    max_attempts,
+                    exc,
                 )
                 await asyncio.sleep(delay)
 
@@ -200,7 +217,8 @@ class BotManager:
             except TelegramNetworkError as exc:
                 logger.warning(
                     "Polling interrupted by network error, restarting in %.1fs: %s",
-                    restart_delay, exc,
+                    restart_delay,
+                    exc,
                 )
                 await asyncio.sleep(restart_delay)
 
@@ -241,4 +259,3 @@ async def shutdown_bot() -> None:
     """Shutdown the global bot manager (for use in shutdown hooks)."""
     manager = get_bot_manager()
     await manager.shutdown()
-

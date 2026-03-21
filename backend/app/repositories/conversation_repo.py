@@ -3,13 +3,14 @@ from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import func, select, update as sa_update
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 from app.config import settings
 from app.models.conversation import Conversation, ConversationMessage
 
 
-async def get_active_conversation(session: AsyncSession, user_id: uuid.UUID) -> Conversation:
+async def get_active_conversation(
+    session: AsyncSession, user_id: uuid.UUID
+) -> Conversation:
     """Return the active conversation for the user, or create a new one.
 
     A new conversation is started if no active conversation exists or if the last
@@ -26,7 +27,10 @@ async def get_active_conversation(session: AsyncSession, user_id: uuid.UUID) -> 
     timeout = timedelta(minutes=settings.conversation_timeout_minutes)
     now = datetime.now(UTC)
 
-    if conversation is None or (now - conversation.last_message_at.replace(tzinfo=UTC)) > timeout:
+    if (
+        conversation is None
+        or (now - conversation.last_message_at.replace(tzinfo=UTC)) > timeout
+    ):
         if conversation is not None:
             conversation.is_active = False
             await session.flush()
@@ -117,14 +121,14 @@ async def add_token_usage(
     await session.flush()
 
 
-async def get_usage_stats(
-    session: AsyncSession, user_id: uuid.UUID
-) -> dict[str, int]:
+async def get_usage_stats(session: AsyncSession, user_id: uuid.UUID) -> dict[str, int]:
     """Return aggregated token usage across all conversations for a user."""
     result = await session.execute(
         select(
             func.coalesce(func.sum(Conversation.input_tokens), 0).label("input_tokens"),
-            func.coalesce(func.sum(Conversation.output_tokens), 0).label("output_tokens"),
+            func.coalesce(func.sum(Conversation.output_tokens), 0).label(
+                "output_tokens"
+            ),
             func.coalesce(func.sum(Conversation.total_tokens), 0).label("total_tokens"),
             func.count(Conversation.id).label("conversation_count"),
         ).where(Conversation.user_id == user_id)

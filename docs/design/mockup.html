@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Receipt Pal v2</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0C0C0E;
+    --surface: #161619;
+    --surface-2: #1E1E22;
+    --surface-3: #28282E;
+    --border: #2A2A30;
+    --text: #E8E6E1;
+    --text-muted: #8A8A8E;
+    --text-dim: #5A5A5E;
+    --accent: #4ADE80;
+    --accent-dim: rgba(74, 222, 128, 0.12);
+    --accent-glow: rgba(74, 222, 128, 0.25);
+    --orange: #FB923C;
+    --orange-dim: rgba(251, 146, 60, 0.12);
+    --red: #F87171;
+    --red-dim: rgba(248, 113, 113, 0.12);
+    --blue: #60A5FA;
+    --blue-dim: rgba(96, 165, 250, 0.12);
+    --purple: #C084FC;
+    --purple-dim: rgba(192, 132, 252, 0.12);
+    --yellow: #FACC15;
+    --yellow-dim: rgba(250, 204, 21, 0.12);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --radius-xs: 6px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100dvh;
+    overflow-x: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .phone-frame {
+    width: 390px;
+    height: 844px;
+    background: var(--bg);
+    border-radius: 44px;
+    border: 2px solid var(--border);
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 0 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.03);
+  }
+
+  .screen {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    transform: translateX(20px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .screen::-webkit-scrollbar { display: none; }
+  .screen.active {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateX(0);
+  }
+
+  /* ===== SHARED COMPONENTS ===== */
+  .top-bar {
+    padding: 54px 20px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    flex-shrink: 0;
+  }
+  .top-bar-left { display: flex; align-items: center; gap: 10px; }
+  .top-bar-avatar {
+    width: 34px; height: 34px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), #22C55E);
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+  .top-bar h3 { font-size: 16px; font-weight: 600; }
+  .top-bar-right { display: flex; gap: 6px; align-items: center; }
+
+  .icon-btn {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text-muted); display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 16px; transition: all 0.2s;
+  }
+  .icon-btn:hover { color: var(--text); border-color: var(--text-dim); }
+
+  .free-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; color: var(--text-dim); background: var(--surface);
+    border: 1px solid var(--border); padding: 4px 10px; border-radius: 20px;
+    font-family: 'Space Mono', monospace;
+  }
+  .free-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .bottom-nav {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    display: flex; padding: 8px 16px 28px;
+    background: var(--bg); border-top: 1px solid var(--border); z-index: 20;
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 8px 0; cursor: pointer; border: none; background: none;
+    color: var(--text-dim); font-family: inherit; font-size: 10px; font-weight: 500;
+    transition: color 0.2s;
+  }
+  .nav-item .nav-icon { font-size: 20px; }
+  .nav-item.active { color: var(--accent); }
+  .nav-item:hover { color: var(--text-muted); }
+
+  .cta-btn {
+    width: 100%; padding: 16px; border: none; border-radius: var(--radius-sm);
+    background: var(--accent); color: var(--bg); font-family: inherit;
+    font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+  }
+  .cta-btn:hover { box-shadow: 0 6px 24px var(--accent-glow); transform: translateY(-1px); }
+  .cta-btn.secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes msgIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== SPLASH ===== */
+  .splash {
+    justify-content: center; align-items: center; gap: 24px; padding: 40px;
+  }
+  .splash-icon {
+    width: 88px; height: 88px; border-radius: 24px;
+    background: linear-gradient(135deg, var(--accent) 0%, #22C55E 100%);
+    display: flex; align-items: center; justify-content: center; font-size: 40px;
+    box-shadow: 0 12px 40px var(--accent-glow);
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  .splash h1 { font-size: 32px; font-weight: 700; letter-spacing: -0.5px; }
+  .splash h1 span { color: var(--accent); }
+  .splash p { color: var(--text-muted); font-size: 15px; text-align: center; line-height: 1.6; max-width: 280px; }
+  .splash-features { display: flex; gap: 12px; margin-top: 8px; }
+  .splash-feat {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 12px 14px; font-size: 12px; color: var(--text-muted);
+    display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1;
+  }
+  .splash-feat span { font-size: 20px; }
+
+  /* ===== ONBOARDING ===== */
+  .onboarding { padding: 60px 28px 40px; gap: 32px; }
+  .onboard-progress { display: flex; gap: 8px; }
+  .onboard-progress .dot { height: 3px; flex: 1; border-radius: 2px; background: var(--surface-3); transition: background 0.4s; }
+  .onboard-progress .dot.filled { background: var(--accent); }
+  .onboard-step { display: none; flex-direction: column; gap: 24px; animation: fadeUp 0.4s ease; }
+  .onboard-step.active { display: flex; }
+  .onboard-step h2 { font-size: 24px; font-weight: 600; letter-spacing: -0.3px; line-height: 1.3; }
+  .onboard-step h2 .emoji { font-size: 28px; display: block; margin-bottom: 8px; }
+  .option-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .option-btn {
+    background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+    padding: 16px; color: var(--text); font-family: inherit; font-size: 14px; font-weight: 500;
+    cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column;
+    align-items: center; gap: 8px; text-align: center;
+  }
+  .option-btn span { font-size: 24px; }
+  .option-btn:hover { border-color: var(--accent); background: var(--accent-dim); }
+  .option-btn.selected { border-color: var(--accent); background: var(--accent-dim); box-shadow: 0 0 20px var(--accent-glow); }
+  .goal-options { display: flex; flex-direction: column; gap: 10px; }
+  .goal-btn {
+    background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+    padding: 16px 18px; color: var(--text); font-family: inherit; font-size: 14px; font-weight: 500;
+    cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 12px;
+  }
+  .goal-btn span { font-size: 22px; }
+  .goal-btn:hover { border-color: var(--accent); background: var(--accent-dim); }
+  .goal-btn.selected { border-color: var(--accent); background: var(--accent-dim); }
+  .goal-btn .check {
+    margin-left: auto; width: 20px; height: 20px; border-radius: 50%;
+    border: 2px solid var(--border); display: flex; align-items: center;
+    justify-content: center; font-size: 11px; transition: all 0.2s;
+  }
+  .goal-btn.selected .check { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+
+  /* ===== CHAT SCREEN ===== */
+  .main-screen { flex-direction: column; }
+  .chat-area { flex: 1; padding: 16px 16px 100px; display: flex; flex-direction: column; gap: 12px; }
+  .msg { max-width: 85%; animation: msgIn 0.35s ease; }
+  .msg.bot { align-self: flex-start; }
+  .msg.user { align-self: flex-end; }
+  .msg-bubble { padding: 14px 16px; border-radius: var(--radius); font-size: 14px; line-height: 1.55; }
+  .msg.bot .msg-bubble { background: var(--surface); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+  .msg.user .msg-bubble { background: var(--accent); color: var(--bg); border-bottom-right-radius: 4px; font-weight: 500; }
+  .msg-time { font-size: 11px; color: var(--text-dim); margin-top: 4px; font-family: 'Space Mono', monospace; }
+  .msg.user .msg-time { text-align: right; }
+
+  /* Receipt Card */
+  .receipt-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 18px; max-width: 85%; animation: msgIn 0.35s ease;
+  }
+  .receipt-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+  .receipt-merchant { font-weight: 600; font-size: 15px; }
+  .receipt-date { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .receipt-tag {
+    font-size: 11px; padding: 4px 10px; border-radius: 20px;
+    background: var(--accent-dim); color: var(--accent); font-weight: 600;
+  }
+  .receipt-items {
+    border-top: 1px dashed var(--border); border-bottom: 1px dashed var(--border);
+    padding: 12px 0; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px;
+  }
+  .receipt-item { display: flex; justify-content: space-between; font-size: 13px; }
+  .receipt-item .name { color: var(--text-muted); }
+  .receipt-item .price { font-family: 'Space Mono', monospace; font-size: 12px; }
+  .receipt-item.uncertain .name { color: var(--yellow); font-style: italic; }
+  .receipt-item.uncertain .price { color: var(--yellow); }
+  .receipt-total { display: flex; justify-content: space-between; align-items: center; }
+  .receipt-total .label { font-size: 13px; color: var(--text-muted); }
+  .receipt-total .amount { font-family: 'Space Mono', monospace; font-size: 18px; font-weight: 700; color: var(--accent); }
+
+  .receipt-location {
+    display: flex; align-items: center; gap: 8px; margin-top: 12px;
+    padding: 10px 12px; background: var(--surface-2); border-radius: var(--radius-xs);
+    font-size: 12px; color: var(--text-muted); cursor: pointer; transition: all 0.2s;
+  }
+  .receipt-location:hover { background: var(--surface-3); color: var(--text); }
+  .receipt-location .loc-icon { font-size: 14px; }
+  .receipt-location .loc-rating { margin-left: auto; color: var(--yellow); font-weight: 600; }
+
+  .receipt-actions { display: flex; gap: 8px; margin-top: 12px; }
+  .receipt-actions button {
+    flex: 1; padding: 10px; border-radius: var(--radius-xs); border: none;
+    font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-confirm { background: var(--accent); color: var(--bg); }
+  .btn-confirm:hover { box-shadow: 0 4px 16px var(--accent-glow); }
+  .btn-edit { background: var(--surface-3); color: var(--text-muted); }
+  .btn-edit:hover { color: var(--text); }
+
+  /* Upload area */
+  .upload-preview { max-width: 85%; align-self: flex-end; animation: msgIn 0.35s ease; }
+  .upload-img {
+    width: 200px; height: 260px; border-radius: var(--radius);
+    background: var(--surface-2); border: 1px solid var(--border);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 8px; color: var(--text-muted); font-size: 13px; position: relative; overflow: hidden;
+  }
+  .upload-img .receipt-emoji { font-size: 48px; opacity: 0.8; }
+  .upload-img .scan-line {
+    position: absolute; width: 100%; height: 2px;
+    background: var(--accent); box-shadow: 0 0 20px var(--accent-glow), 0 0 60px var(--accent-glow);
+    animation: scan 2s ease-in-out infinite;
+  }
+  @keyframes scan { 0% { top: 10%; opacity: 1; } 50% { top: 85%; opacity: 1; } 51% { opacity: 0; } 100% { top: 10%; opacity: 0; } }
+
+  /* Chat input */
+  .chat-input-bar {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 12px 16px 32px;
+    background: linear-gradient(transparent, var(--bg) 20%);
+    display: flex; gap: 8px; align-items: flex-end;
+  }
+  .chat-input {
+    flex: 1; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 22px; padding: 12px 18px; color: var(--text);
+    font-family: inherit; font-size: 14px; outline: none;
+  }
+  .chat-input::placeholder { color: var(--text-dim); }
+  .chat-input:focus { border-color: var(--accent); }
+
+  .send-btn, .camera-btn, .mic-btn {
+    width: 44px; height: 44px; border-radius: 50%; border: none;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 18px; transition: all 0.2s; flex-shrink: 0;
+  }
+  .camera-btn { background: var(--surface-2); color: var(--text-muted); border: 1px solid var(--border); }
+  .camera-btn:hover { color: var(--accent); border-color: var(--accent); }
+  .mic-btn { background: var(--surface-2); color: var(--text-muted); border: 1px solid var(--border); }
+  .mic-btn:hover { color: var(--orange); border-color: var(--orange); }
+  .mic-btn.recording { background: var(--red); color: white; border-color: var(--red); animation: pulse 1.5s ease infinite; }
+  @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(248,113,113,0.4); } 50% { box-shadow: 0 0 0 12px rgba(248,113,113,0); } }
+  .send-btn { background: var(--accent); color: var(--bg); }
+  .send-btn:hover { box-shadow: 0 4px 16px var(--accent-glow); }
+
+  /* Voice recording overlay */
+  .voice-overlay {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: var(--surface); border-top: 1px solid var(--border);
+    padding: 20px 16px 36px; display: none; flex-direction: column; align-items: center; gap: 16px;
+    z-index: 30; animation: slideUp 0.3s ease;
+  }
+  .voice-overlay.active { display: flex; }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .voice-waves {
+    display: flex; align-items: center; gap: 3px; height: 40px;
+  }
+  .voice-wave-bar {
+    width: 4px; border-radius: 2px; background: var(--accent);
+    animation: waveBar 0.8s ease-in-out infinite;
+  }
+  .voice-wave-bar:nth-child(1) { height: 12px; animation-delay: 0s; }
+  .voice-wave-bar:nth-child(2) { height: 24px; animation-delay: 0.1s; }
+  .voice-wave-bar:nth-child(3) { height: 36px; animation-delay: 0.2s; }
+  .voice-wave-bar:nth-child(4) { height: 20px; animation-delay: 0.3s; }
+  .voice-wave-bar:nth-child(5) { height: 32px; animation-delay: 0.15s; }
+  .voice-wave-bar:nth-child(6) { height: 16px; animation-delay: 0.25s; }
+  .voice-wave-bar:nth-child(7) { height: 28px; animation-delay: 0.05s; }
+  .voice-wave-bar:nth-child(8) { height: 14px; animation-delay: 0.35s; }
+  .voice-wave-bar:nth-child(9) { height: 22px; animation-delay: 0.12s; }
+  @keyframes waveBar {
+    0%, 100% { transform: scaleY(0.4); opacity: 0.5; }
+    50% { transform: scaleY(1); opacity: 1; }
+  }
+  .voice-timer { font-family: 'Space Mono', monospace; font-size: 14px; color: var(--text-muted); }
+  .voice-transcript {
+    font-size: 14px; color: var(--text); text-align: center; min-height: 20px;
+    max-width: 90%; line-height: 1.4;
+  }
+  .voice-actions { display: flex; gap: 16px; align-items: center; }
+  .voice-cancel {
+    padding: 10px 20px; border-radius: 20px; background: var(--surface-3);
+    border: none; color: var(--text-muted); font-family: inherit; font-size: 13px;
+    cursor: pointer; font-weight: 500;
+  }
+  .voice-send {
+    width: 56px; height: 56px; border-radius: 50%; background: var(--red);
+    border: none; color: white; font-size: 24px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 20px rgba(248,113,113,0.3);
+  }
+  .voice-send.done { background: var(--accent); box-shadow: 0 4px 20px var(--accent-glow); }
+
+  /* Typing indicator */
+  .typing { display: flex; gap: 4px; padding: 14px 18px; align-items: center; }
+  .typing-dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--text-dim);
+    animation: typingBounce 1.4s ease-in-out infinite;
+  }
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes typingBounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
+
+  /* ===== ANALYTICS SCREEN ===== */
+  .analytics-screen { flex-direction: column; }
+  .analytics-content { padding: 0 16px 100px; display: flex; flex-direction: column; gap: 16px; }
+  .period-toggle { display: flex; background: var(--surface); border-radius: var(--radius-sm); padding: 3px; gap: 2px; margin-bottom: 4px; }
+  .period-btn {
+    flex: 1; padding: 8px; border: none; border-radius: 8px; background: transparent;
+    color: var(--text-muted); font-family: inherit; font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .period-btn.active { background: var(--accent); color: var(--bg); font-weight: 600; }
+  .stat-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px; }
+  .stat-card .label { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+  .stat-card .value { font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 700; }
+  .stat-card .change { font-size: 12px; margin-top: 4px; font-weight: 500; }
+  .stat-card .change.up { color: var(--red); }
+  .stat-card .change.down { color: var(--accent); }
+  .chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
+  .chart-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
+  .bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 120px; padding-bottom: 24px; position: relative; }
+  .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
+  .bar { width: 100%; border-radius: 4px 4px 0 0; background: var(--accent-dim); border: 1px solid rgba(74,222,128,0.2); transition: height 0.6s ease; }
+  .bar.highlight { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 16px var(--accent-glow); }
+  .bar-label { font-size: 11px; color: var(--text-dim); font-family: 'Space Mono', monospace; position: absolute; bottom: -22px; width: 100%; text-align: center; }
+  .category-list { display: flex; flex-direction: column; gap: 10px; }
+  .category-row { display: flex; align-items: center; gap: 12px; }
+  .cat-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .cat-info { flex: 1; }
+  .cat-name { font-size: 13px; font-weight: 500; }
+  .cat-bar-track { height: 4px; background: var(--surface-3); border-radius: 2px; margin-top: 6px; overflow: hidden; }
+  .cat-bar-fill { height: 100%; border-radius: 2px; transition: width 0.8s ease; }
+  .cat-amount { font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 600; text-align: right; }
+  .cat-percent { font-size: 11px; color: var(--text-dim); text-align: right; }
+  .insight-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 18px; display: flex; gap: 14px; align-items: flex-start;
+  }
+  .insight-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .insight-text h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .insight-text p { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+
+  .ask-bubble {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 22px;
+    padding: 12px 18px; font-size: 14px; color: var(--text-dim);
+    display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.2s;
+  }
+  .ask-bubble:hover { border-color: var(--accent); color: var(--text-muted); }
+  .quick-tags { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; -ms-overflow-style: none; scrollbar-width: none; }
+  .quick-tags::-webkit-scrollbar { display: none; }
+  .quick-tag {
+    white-space: nowrap; padding: 8px 14px; border-radius: 20px;
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text-muted); font-size: 12px; font-weight: 500;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .quick-tag:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ===== PLACES / MAP SCREEN ===== */
+  .places-screen { flex-direction: column; }
+
+  .map-container {
+    width: 100%;
+    height: 320px;
+    background: var(--surface-2);
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  /* Stylized dark map */
+  .map-grid {
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0.3;
+  }
+  .map-roads {
+    position: absolute; inset: 0;
+  }
+  .map-road {
+    position: absolute;
+    background: var(--surface-3);
+    border-radius: 2px;
+  }
+  .map-road.h { height: 3px; }
+  .map-road.v { width: 3px; }
+  .map-road.main { background: var(--border); }
+  .map-road.main.h { height: 5px; }
+  .map-road.main.v { width: 5px; }
+
+  .map-label {
+    position: absolute;
+    font-size: 10px;
+    color: var(--text-dim);
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    opacity: 0.5;
+  }
+
+  /* Map pins */
+  .map-pin {
+    position: absolute;
+    transform: translate(-50%, -100%);
+    cursor: pointer;
+    transition: all 0.2s;
+    z-index: 5;
+  }
+  .map-pin:hover { transform: translate(-50%, -100%) scale(1.2); z-index: 10; }
+  .map-pin.active { transform: translate(-50%, -100%) scale(1.3); z-index: 10; }
+  .pin-dot {
+    width: 32px; height: 32px; border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; box-shadow: 0 3px 12px rgba(0,0,0,0.4);
+    border: 2px solid rgba(255,255,255,0.15);
+  }
+  .pin-dot span { transform: rotate(45deg); }
+  .pin-dot.red { background: var(--red); }
+  .pin-dot.orange { background: var(--orange); }
+  .pin-dot.blue { background: var(--blue); }
+  .pin-dot.green { background: var(--accent); }
+  .pin-dot.purple { background: var(--purple); }
+  .pin-pulse {
+    position: absolute; bottom: -2px; left: 50%; transform: translateX(-50%);
+    width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.3);
+  }
+
+  .map-legend {
+    position: absolute; bottom: 12px; left: 12px;
+    display: flex; gap: 10px; z-index: 8;
+  }
+  .legend-item {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 10px; color: var(--text-muted);
+    background: rgba(12,12,14,0.85); padding: 4px 8px; border-radius: 6px;
+    backdrop-filter: blur(8px);
+  }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  .map-filters {
+    position: absolute; top: 12px; left: 12px; right: 12px;
+    display: flex; gap: 6px; z-index: 8; overflow-x: auto;
+    -ms-overflow-style: none; scrollbar-width: none;
+  }
+  .map-filters::-webkit-scrollbar { display: none; }
+  .map-filter {
+    white-space: nowrap; padding: 6px 12px; border-radius: 20px;
+    background: rgba(12,12,14,0.85); backdrop-filter: blur(8px);
+    border: 1px solid var(--border); color: var(--text-muted);
+    font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s;
+    font-family: inherit;
+  }
+  .map-filter.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+
+  /* Places list */
+  .places-content { padding: 16px 16px 100px; display: flex; flex-direction: column; gap: 12px; }
+
+  .places-header {
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .places-header h4 { font-size: 15px; font-weight: 600; }
+  .places-header .count { font-size: 12px; color: var(--text-dim); font-family: 'Space Mono', monospace; }
+
+  .place-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px; cursor: pointer; transition: all 0.2s;
+  }
+  .place-card:hover { border-color: var(--accent-glow); }
+  .place-card-top { display: flex; gap: 14px; align-items: flex-start; }
+  .place-photo {
+    width: 56px; height: 56px; border-radius: 12px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 24px;
+  }
+  .place-info { flex: 1; min-width: 0; }
+  .place-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+  .place-address { font-size: 12px; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .place-meta {
+    display: flex; align-items: center; gap: 8px; margin-top: 6px; flex-wrap: wrap;
+  }
+  .place-rating {
+    display: flex; align-items: center; gap: 3px;
+    font-size: 12px; font-weight: 600; color: var(--yellow);
+  }
+  .place-rating-stars { font-size: 10px; letter-spacing: -1px; }
+  .place-visits {
+    font-size: 11px; color: var(--text-muted); background: var(--surface-2);
+    padding: 2px 8px; border-radius: 10px;
+  }
+  .place-category-tag {
+    font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 500;
+  }
+
+  .place-card-stats {
+    display: flex; gap: 1px; margin-top: 12px; background: var(--border); border-radius: 8px; overflow: hidden;
+  }
+  .place-stat {
+    flex: 1; background: var(--surface-2); padding: 10px 8px; text-align: center;
+  }
+  .place-stat .ps-val { font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 700; }
+  .place-stat .ps-label { font-size: 10px; color: var(--text-dim); margin-top: 2px; }
+
+  .place-items-peek {
+    display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap;
+  }
+  .item-chip {
+    font-size: 11px; padding: 4px 10px; border-radius: 12px;
+    background: var(--surface-3); color: var(--text-muted);
+  }
+
+  /* ===== PLACE DETAIL SCREEN ===== */
+  .place-detail-screen { flex-direction: column; }
+  .place-detail-hero {
+    height: 200px; position: relative; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 64px;
+    background: linear-gradient(135deg, var(--surface-2), var(--surface));
+  }
+  .place-detail-hero .back-btn {
+    position: absolute; top: 54px; left: 16px;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(12,12,14,0.7); backdrop-filter: blur(8px);
+    border: 1px solid var(--border); color: var(--text);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 14px; z-index: 5;
+  }
+  .place-detail-hero .gmap-btn {
+    position: absolute; top: 54px; right: 16px;
+    padding: 6px 12px; border-radius: 20px;
+    background: rgba(12,12,14,0.7); backdrop-filter: blur(8px);
+    border: 1px solid var(--border); color: var(--text-muted);
+    font-size: 12px; font-family: inherit; font-weight: 500;
+    cursor: pointer; z-index: 5; display: flex; align-items: center; gap: 4px;
+    transition: all 0.2s;
+  }
+  .place-detail-hero .gmap-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+  .place-detail-content { padding: 20px 16px 40px; display: flex; flex-direction: column; gap: 16px; }
+  .pd-header { display: flex; justify-content: space-between; align-items: flex-start; }
+  .pd-name { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+  .pd-cuisine { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+  .pd-rating-big {
+    display: flex; flex-direction: column; align-items: center;
+    background: var(--yellow-dim); padding: 8px 14px; border-radius: var(--radius-sm);
+  }
+  .pd-rating-big .num { font-family: 'Space Mono', monospace; font-size: 22px; font-weight: 700; color: var(--yellow); }
+  .pd-rating-big .src { font-size: 10px; color: var(--text-dim); }
+
+  .pd-address {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--text-muted);
+  }
+
+  .pd-your-stats {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px;
+  }
+  .pd-your-stats h4 { font-size: 13px; color: var(--text-dim); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .pd-stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .pd-stat-item { text-align: center; }
+  .pd-stat-item .val { font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 700; }
+  .pd-stat-item .lbl { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+
+  .pd-items-section { }
+  .pd-items-section h4 { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+  .pd-menu-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+  }
+  .pd-menu-item:last-child { border-bottom: none; }
+  .pd-item-name { font-size: 13px; }
+  .pd-item-freq { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+  .pd-item-price { font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 600; }
+
+  .pd-visits-section h4 { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+  .visit-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+  }
+  .visit-row:last-child { border-bottom: none; }
+  .visit-date { font-size: 13px; color: var(--text-muted); }
+  .visit-amount { font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 600; }
+
+  .pd-similar {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px;
+  }
+  .pd-similar h4 { font-size: 13px; color: var(--text-dim); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .similar-place {
+    display: flex; align-items: center; gap: 12px; padding: 8px 0;
+  }
+  .similar-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .similar-info { flex: 1; }
+  .similar-name { font-size: 13px; font-weight: 500; }
+  .similar-detail { font-size: 11px; color: var(--text-dim); }
+  .similar-tag {
+    font-size: 10px; padding: 3px 8px; border-radius: 10px;
+    background: var(--accent-dim); color: var(--accent); font-weight: 600;
+  }
+
+  /* Responsive */
+  @media (max-width: 420px) {
+    body { align-items: flex-start; }
+    .phone-frame { width: 100%; height: 100dvh; border-radius: 0; border: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="phone-frame">
+
+  <!-- ====== SPLASH ====== -->
+  <div class="screen splash active" id="splashScreen">
+    <div class="splash-icon">🧾</div>
+    <h1>Receipt <span>Pal</span></h1>
+    <p>Your financial companion that learns from every receipt. Track, understand, and optimize your spending.</p>
+    <div class="splash-features">
+      <div class="splash-feat"><span>📸</span>Scan</div>
+      <div class="splash-feat"><span>🧠</span>Remember</div>
+      <div class="splash-feat"><span>💡</span>Advise</div>
+    </div>
+    <button class="cta-btn" onclick="goTo('onboardScreen', 0)" style="margin-top: 24px;">Get Started</button>
+    <button class="cta-btn secondary" onclick="goTo('mainScreen')" style="margin-top: 4px; font-size: 13px;">Skip to Demo →</button>
+  </div>
+
+  <!-- ====== ONBOARDING ====== -->
+  <div class="screen onboarding" id="onboardScreen">
+    <div class="onboard-progress">
+      <div class="dot filled" id="dot0"></div>
+      <div class="dot" id="dot1"></div>
+      <div class="dot" id="dot2"></div>
+    </div>
+    <div class="onboard-step active" id="step0">
+      <h2><span class="emoji">💰</span>What's your currency?</h2>
+      <div class="option-grid">
+        <button class="option-btn" onclick="selectOption(this, 0)"><span>🇻🇳</span>VND</button>
+        <button class="option-btn" onclick="selectOption(this, 0)"><span>🇺🇸</span>USD</button>
+        <button class="option-btn" onclick="selectOption(this, 0)"><span>🇹🇭</span>THB</button>
+        <button class="option-btn" onclick="selectOption(this, 0)"><span>🌍</span>Other</button>
+      </div>
+    </div>
+    <div class="onboard-step" id="step1">
+      <h2><span class="emoji">📍</span>Where are you based?</h2>
+      <div class="option-grid">
+        <button class="option-btn" onclick="selectOption(this, 1)"><span>🏙️</span>HCMC</button>
+        <button class="option-btn" onclick="selectOption(this, 1)"><span>🏯</span>Hanoi</button>
+        <button class="option-btn" onclick="selectOption(this, 1)"><span>🛕</span>Bangkok</button>
+        <button class="option-btn" onclick="selectOption(this, 1)"><span>📍</span>Other</button>
+      </div>
+    </div>
+    <div class="onboard-step" id="step2">
+      <h2><span class="emoji">🎯</span>What matters most?</h2>
+      <p style="color: var(--text-muted); font-size: 14px; margin-top: -12px;">Pick all that apply</p>
+      <div class="goal-options">
+        <button class="goal-btn" onclick="toggleGoal(this)"><span>💰</span>Save money & track spending<div class="check">✓</div></button>
+        <button class="goal-btn" onclick="toggleGoal(this)"><span>🥗</span>Eat healthier<div class="check">✓</div></button>
+        <button class="goal-btn" onclick="toggleGoal(this)"><span>🍜</span>Discover great food<div class="check">✓</div></button>
+        <button class="goal-btn" onclick="toggleGoal(this)"><span>📊</span>Understand my habits<div class="check">✓</div></button>
+      </div>
+      <button class="cta-btn" onclick="goTo('mainScreen')" style="margin-top: 12px;">Start Scanning →</button>
+    </div>
+  </div>
+
+  <!-- ====== MAIN CHAT ====== -->
+  <div class="screen main-screen" id="mainScreen">
+    <div class="top-bar">
+      <div class="top-bar-left">
+        <div class="top-bar-avatar">🧾</div>
+        <h3>Receipt Pal</h3>
+      </div>
+      <div class="top-bar-right">
+        <div class="free-badge"><div class="dot"></div>12/15 free</div>
+        <button class="icon-btn" onclick="goTo('analyticsScreen')">📊</button>
+      </div>
+    </div>
+
+    <div class="chat-area" id="chatArea">
+      <div class="msg bot">
+        <div class="msg-bubble">Hey! 👋 I'm your Receipt Pal. Send me a photo, voice note, or just type — I'll remember everything.</div>
+        <div class="msg-time">10:30 AM</div>
+      </div>
+    </div>
+
+    <!-- Voice recording overlay -->
+    <div class="voice-overlay" id="voiceOverlay">
+      <div class="voice-waves">
+        <div class="voice-wave-bar"></div><div class="voice-wave-bar"></div>
+        <div class="voice-wave-bar"></div><div class="voice-wave-bar"></div>
+        <div class="voice-wave-bar"></div><div class="voice-wave-bar"></div>
+        <div class="voice-wave-bar"></div><div class="voice-wave-bar"></div>
+        <div class="voice-wave-bar"></div>
+      </div>
+      <div class="voice-timer" id="voiceTimer">0:00</div>
+      <div class="voice-transcript" id="voiceTranscript">Listening...</div>
+      <div class="voice-actions">
+        <button class="voice-cancel" onclick="cancelVoice()">Cancel</button>
+        <button class="voice-send" id="voiceSendBtn" onclick="sendVoice()">⏹</button>
+      </div>
+    </div>
+
+    <div class="chat-input-bar" id="chatInputBar">
+      <button class="camera-btn" onclick="simulateUpload()">📷</button>
+      <button class="mic-btn" id="micBtn" onclick="startVoice()">🎤</button>
+      <input class="chat-input" placeholder="Ask about your spending..." id="chatInput" onkeydown="if(event.key==='Enter')handleChatSend()">
+      <button class="send-btn" onclick="handleChatSend()">↑</button>
+    </div>
+  </div>
+
+  <!-- ====== ANALYTICS ====== -->
+  <div class="screen analytics-screen" id="analyticsScreen">
+    <div class="top-bar">
+      <div class="top-bar-left">
+        <button class="icon-btn" onclick="goTo('mainScreen')" style="font-size: 14px;">←</button>
+        <h3>Analytics</h3>
+      </div>
+      <div class="top-bar-right">
+        <div class="free-badge"><div class="dot"></div>Feb 2026</div>
+      </div>
+    </div>
+    <div class="analytics-content" style="padding-top: 16px;">
+      <div class="period-toggle">
+        <button class="period-btn">Week</button>
+        <button class="period-btn active">Month</button>
+        <button class="period-btn">Year</button>
+      </div>
+      <div class="stat-cards">
+        <div class="stat-card"><div class="label">Total Spent</div><div class="value" style="color: var(--text);">8.2M</div><div class="change up">↑ 12% vs Jan</div></div>
+        <div class="stat-card"><div class="label">Receipts</div><div class="value" style="color: var(--text);">34</div><div class="change down">↓ 3 vs Jan</div></div>
+        <div class="stat-card"><div class="label">Avg / Receipt</div><div class="value" style="color: var(--orange);">241K</div><div class="change up">↑ 8%</div></div>
+        <div class="stat-card"><div class="label">Dining Out</div><div class="value" style="color: var(--purple);">18x</div><div class="change" style="color: var(--text-dim);">same as Jan</div></div>
+      </div>
+      <div class="chart-card">
+        <h4>Weekly Spending</h4>
+        <div class="bar-chart">
+          <div class="bar-col"><div class="bar" style="height: 45%;"></div><span class="bar-label">W1</span></div>
+          <div class="bar-col"><div class="bar" style="height: 72%;"></div><span class="bar-label">W2</span></div>
+          <div class="bar-col"><div class="bar" style="height: 55%;"></div><span class="bar-label">W3</span></div>
+          <div class="bar-col"><div class="bar highlight" style="height: 90%;"></div><span class="bar-label">W4</span></div>
+        </div>
+      </div>
+      <div class="chart-card">
+        <h4>By Category</h4>
+        <div class="category-list">
+          <div class="category-row"><div class="cat-icon" style="background: var(--orange-dim);">🍜</div><div class="cat-info"><div class="cat-name">Dining</div><div class="cat-bar-track"><div class="cat-bar-fill" style="width: 42%; background: var(--orange);"></div></div></div><div><div class="cat-amount" style="color: var(--orange);">3.4M</div><div class="cat-percent">42%</div></div></div>
+          <div class="category-row"><div class="cat-icon" style="background: var(--accent-dim);">🛒</div><div class="cat-info"><div class="cat-name">Groceries</div><div class="cat-bar-track"><div class="cat-bar-fill" style="width: 28%; background: var(--accent);"></div></div></div><div><div class="cat-amount" style="color: var(--accent);">2.3M</div><div class="cat-percent">28%</div></div></div>
+          <div class="category-row"><div class="cat-icon" style="background: var(--blue-dim);">☕</div><div class="cat-info"><div class="cat-name">Café & Drinks</div><div class="cat-bar-track"><div class="cat-bar-fill" style="width: 18%; background: var(--blue);"></div></div></div><div><div class="cat-amount" style="color: var(--blue);">1.5M</div><div class="cat-percent">18%</div></div></div>
+          <div class="category-row"><div class="cat-icon" style="background: var(--purple-dim);">🏥</div><div class="cat-info"><div class="cat-name">Health</div><div class="cat-bar-track"><div class="cat-bar-fill" style="width: 12%; background: var(--purple);"></div></div></div><div><div class="cat-amount" style="color: var(--purple);">1.0M</div><div class="cat-percent">12%</div></div></div>
+        </div>
+      </div>
+      <div class="insight-card"><div class="insight-icon" style="background: var(--orange-dim);">🍵</div><div class="insight-text"><h4>Sugar Drink Alert</h4><p>You've had trà sữa 6 times this week — up from 3x last week. That's ~330K on boba alone 🧋</p></div></div>
+      <div class="insight-card"><div class="insight-icon" style="background: var(--accent-dim);">💡</div><div class="insight-text"><h4>Savings Opportunity</h4><p>Your morning coffee at Phúc Long costs 55K. Highlands is 39K — same oolong latte. Could save 480K/month.</p></div></div>
+      <div class="ask-bubble" onclick="goTo('mainScreen'); setTimeout(()=>document.getElementById('chatInput').focus(), 400)"><span style="font-size:16px">✨</span>Ask me anything about your spending...</div>
+      <div class="quick-tags">
+        <span class="quick-tag">🍣 Sushi spending?</span>
+        <span class="quick-tag">📈 Feb vs Jan</span>
+        <span class="quick-tag">🏪 Top stores</span>
+        <span class="quick-tag">🥗 Health score</span>
+      </div>
+      <div style="height: 40px;"></div>
+    </div>
+    <div class="bottom-nav">
+      <button class="nav-item" onclick="goTo('mainScreen')"><span class="nav-icon">💬</span>Chat</button>
+      <button class="nav-item active"><span class="nav-icon">📊</span>Analytics</button>
+      <button class="nav-item" onclick="goTo('placesScreen')"><span class="nav-icon">📍</span>Places</button>
+      <button class="nav-item"><span class="nav-icon">👤</span>Profile</button>
+    </div>
+  </div>
+
+  <!-- ====== PLACES / MAP ====== -->
+  <div class="screen places-screen" id="placesScreen">
+    <div class="top-bar">
+      <div class="top-bar-left">
+        <button class="icon-btn" onclick="goTo('mainScreen')" style="font-size: 14px;">←</button>
+        <h3>My Places</h3>
+      </div>
+      <div class="top-bar-right">
+        <div class="free-badge"><div class="dot"></div>23 places</div>
+      </div>
+    </div>
+
+    <!-- Stylized Map -->
+    <div class="map-container">
+      <div class="map-grid"></div>
+      <div class="map-roads">
+        <!-- Main roads -->
+        <div class="map-road main h" style="top: 35%; left: 0; width: 100%;"></div>
+        <div class="map-road main h" style="top: 65%; left: 0; width: 100%;"></div>
+        <div class="map-road main v" style="left: 30%; top: 0; height: 100%;"></div>
+        <div class="map-road main v" style="left: 70%; top: 0; height: 100%;"></div>
+        <!-- Secondary -->
+        <div class="map-road h" style="top: 20%; left: 10%; width: 55%;"></div>
+        <div class="map-road h" style="top: 50%; left: 20%; width: 70%;"></div>
+        <div class="map-road h" style="top: 80%; left: 5%; width: 60%;"></div>
+        <div class="map-road v" style="left: 15%; top: 10%; height: 50%;"></div>
+        <div class="map-road v" style="left: 50%; top: 25%; height: 55%;"></div>
+        <div class="map-road v" style="left: 85%; top: 30%; height: 40%;"></div>
+      </div>
+
+      <!-- District labels -->
+      <div class="map-label" style="top: 12%; left: 8%;">Quận 1</div>
+      <div class="map-label" style="top: 42%; left: 55%;">Quận 3</div>
+      <div class="map-label" style="top: 75%; left: 72%;">Bình Thạnh</div>
+
+      <!-- Map Pins -->
+      <div class="map-pin active" style="top: 30%; left: 25%;" onclick="goTo('placeDetailScreen')">
+        <div class="pin-dot red"><span>☕</span></div>
+        <div class="pin-pulse"></div>
+      </div>
+      <div class="map-pin" style="top: 28%; left: 42%;">
+        <div class="pin-dot orange"><span>🍜</span></div>
+      </div>
+      <div class="map-pin" style="top: 45%; left: 55%;" onclick="goTo('placeDetailScreen')">
+        <div class="pin-dot orange"><span>🍣</span></div>
+      </div>
+      <div class="map-pin" style="top: 55%; left: 35%;">
+        <div class="pin-dot blue"><span>🛒</span></div>
+      </div>
+      <div class="map-pin" style="top: 22%; left: 65%;">
+        <div class="pin-dot green"><span>☕</span></div>
+      </div>
+      <div class="map-pin" style="top: 60%; left: 75%;">
+        <div class="pin-dot purple"><span>🍺</span></div>
+      </div>
+      <div class="map-pin" style="top: 72%; left: 45%;">
+        <div class="pin-dot orange"><span>🍜</span></div>
+      </div>
+      <div class="map-pin" style="top: 38%; left: 82%;">
+        <div class="pin-dot blue"><span>🏪</span></div>
+      </div>
+
+      <!-- Filters -->
+      <div class="map-filters">
+        <button class="map-filter active">All</button>
+        <button class="map-filter">🍜 Dining</button>
+        <button class="map-filter">☕ Café</button>
+        <button class="map-filter">🛒 Grocery</button>
+        <button class="map-filter">🍺 Bar</button>
+      </div>
+
+      <!-- Legend -->
+      <div class="map-legend">
+        <div class="legend-item"><div class="legend-dot" style="background: var(--red);"></div>5+ visits</div>
+        <div class="legend-item"><div class="legend-dot" style="background: var(--orange);"></div>2-4</div>
+        <div class="legend-item"><div class="legend-dot" style="background: var(--blue);"></div>1 visit</div>
+      </div>
+    </div>
+
+    <!-- Places List -->
+    <div class="places-content">
+      <div class="places-header">
+        <h4>Most Visited</h4>
+        <span class="count">Feb 2026</span>
+      </div>
+
+      <!-- Place 1 -->
+      <div class="place-card" onclick="goTo('placeDetailScreen')">
+        <div class="place-card-top">
+          <div class="place-photo" style="background: var(--red-dim);">☕</div>
+          <div class="place-info">
+            <div class="place-name">Phúc Long - Nguyễn Huệ</div>
+            <div class="place-address">123 Nguyễn Huệ, Bến Nghé, Quận 1</div>
+            <div class="place-meta">
+              <div class="place-rating">⭐ 4.3<span class="place-rating-stars"></span></div>
+              <div class="place-visits">8 visits</div>
+              <span class="place-category-tag" style="background: var(--orange-dim); color: var(--orange);">☕ Café</span>
+            </div>
+          </div>
+        </div>
+        <div class="place-card-stats">
+          <div class="place-stat"><div class="ps-val" style="color: var(--accent);">440K</div><div class="ps-label">Total spent</div></div>
+          <div class="place-stat"><div class="ps-val">55K</div><div class="ps-label">Avg visit</div></div>
+          <div class="place-stat"><div class="ps-val" style="color: var(--orange);">2d</div><div class="ps-label">Last visit</div></div>
+        </div>
+        <div class="place-items-peek">
+          <div class="item-chip">Trà sữa Oolong ×6</div>
+          <div class="item-chip">Bánh mì ×3</div>
+          <div class="item-chip">Trà đào ×2</div>
+        </div>
+      </div>
+
+      <!-- Place 2 -->
+      <div class="place-card">
+        <div class="place-card-top">
+          <div class="place-photo" style="background: var(--orange-dim);">🍜</div>
+          <div class="place-info">
+            <div class="place-name">Cơm Tấm Bụi Sài Gòn</div>
+            <div class="place-address">84 Nguyễn Du, Bến Nghé, Quận 1</div>
+            <div class="place-meta">
+              <div class="place-rating">⭐ 4.5</div>
+              <div class="place-visits">6 visits</div>
+              <span class="place-category-tag" style="background: var(--orange-dim); color: var(--orange);">🍜 Dining</span>
+            </div>
+          </div>
+        </div>
+        <div class="place-card-stats">
+          <div class="place-stat"><div class="ps-val" style="color: var(--accent);">510K</div><div class="ps-label">Total spent</div></div>
+          <div class="place-stat"><div class="ps-val">85K</div><div class="ps-label">Avg visit</div></div>
+          <div class="place-stat"><div class="ps-val" style="color: var(--orange);">5d</div><div class="ps-label">Last visit</div></div>
+        </div>
+        <div class="place-items-peek">
+          <div class="item-chip">Sườn bì chả ×5</div>
+          <div class="item-chip">Nước mía ×4</div>
+        </div>
+      </div>
+
+      <!-- Place 3 -->
+      <div class="place-card">
+        <div class="place-card-top">
+          <div class="place-photo" style="background: var(--blue-dim);">🍣</div>
+          <div class="place-info">
+            <div class="place-name">Sushi Hokkaido</div>
+            <div class="place-address">15 Lê Thánh Tôn, Bến Nghé, Quận 1</div>
+            <div class="place-meta">
+              <div class="place-rating">⭐ 4.1</div>
+              <div class="place-visits">3 visits</div>
+              <span class="place-category-tag" style="background: var(--blue-dim); color: var(--blue);">🍣 Japanese</span>
+            </div>
+          </div>
+        </div>
+        <div class="place-card-stats">
+          <div class="place-stat"><div class="ps-val" style="color: var(--accent);">960K</div><div class="ps-label">Total spent</div></div>
+          <div class="place-stat"><div class="ps-val">320K</div><div class="ps-label">Avg visit</div></div>
+          <div class="place-stat"><div class="ps-val">12d</div><div class="ps-label">Last visit</div></div>
+        </div>
+      </div>
+
+      <div style="height: 40px;"></div>
+    </div>
+
+    <div class="bottom-nav">
+      <button class="nav-item" onclick="goTo('mainScreen')"><span class="nav-icon">💬</span>Chat</button>
+      <button class="nav-item" onclick="goTo('analyticsScreen')"><span class="nav-icon">📊</span>Analytics</button>
+      <button class="nav-item active"><span class="nav-icon">📍</span>Places</button>
+      <button class="nav-item"><span class="nav-icon">👤</span>Profile</button>
+    </div>
+  </div>
+
+  <!-- ====== PLACE DETAIL ====== -->
+  <div class="screen place-detail-screen" id="placeDetailScreen">
+    <div class="place-detail-hero" style="background: linear-gradient(135deg, #1a0f0f, #1a1510);">
+      ☕
+      <button class="back-btn" onclick="goTo('placesScreen')">←</button>
+      <button class="gmap-btn" onclick="window.open('https://maps.google.com/?q=Phuc+Long+Nguyen+Hue+HCMC','_blank')">
+        📍 Open in Maps
+      </button>
+    </div>
+
+    <div class="place-detail-content">
+      <div class="pd-header">
+        <div>
+          <div class="pd-name">Phúc Long - Nguyễn Huệ</div>
+          <div class="pd-cuisine">Café & Tea · Quận 1</div>
+        </div>
+        <div class="pd-rating-big">
+          <div class="num">4.3</div>
+          <div class="src">Google</div>
+        </div>
+      </div>
+
+      <div class="pd-address">
+        <span>📍</span> 123 Nguyễn Huệ, Bến Nghé, Quận 1, HCMC
+      </div>
+
+      <div class="pd-your-stats">
+        <h4>Your history</h4>
+        <div class="pd-stats-grid">
+          <div class="pd-stat-item"><div class="val" style="color: var(--accent);">8</div><div class="lbl">Visits</div></div>
+          <div class="pd-stat-item"><div class="val" style="color: var(--orange);">440K</div><div class="lbl">Total</div></div>
+          <div class="pd-stat-item"><div class="val">55K</div><div class="lbl">Avg/visit</div></div>
+        </div>
+      </div>
+
+      <div class="pd-items-section">
+        <h4>Your Usual Orders</h4>
+        <div class="pd-menu-item">
+          <div><div class="pd-item-name">🧋 Trà sữa Oolong (L)</div><div class="pd-item-freq">Ordered 6 times</div></div>
+          <div class="pd-item-price">55,000đ</div>
+        </div>
+        <div class="pd-menu-item">
+          <div><div class="pd-item-name">🥖 Bánh mì thịt</div><div class="pd-item-freq">Ordered 3 times</div></div>
+          <div class="pd-item-price">35,000đ</div>
+        </div>
+        <div class="pd-menu-item">
+          <div><div class="pd-item-name">🍑 Trà đào cam sả (M)</div><div class="pd-item-freq">Ordered 2 times</div></div>
+          <div class="pd-item-price">45,000đ</div>
+        </div>
+        <div class="pd-menu-item">
+          <div><div class="pd-item-name">🫖 Trà Ô long (L)</div><div class="pd-item-freq">Ordered 1 time</div></div>
+          <div class="pd-item-price">50,000đ</div>
+        </div>
+      </div>
+
+      <div class="pd-visits-section">
+        <h4>Recent Visits</h4>
+        <div class="visit-row"><div class="visit-date">Feb 26, 2026</div><div class="visit-amount" style="color: var(--accent);">90,000đ</div></div>
+        <div class="visit-row"><div class="visit-date">Feb 23, 2026</div><div class="visit-amount">55,000đ</div></div>
+        <div class="visit-row"><div class="visit-date">Feb 20, 2026</div><div class="visit-amount">100,000đ</div></div>
+        <div class="visit-row"><div class="visit-date">Feb 17, 2026</div><div class="visit-amount">55,000đ</div></div>
+        <div class="visit-row"><div class="visit-date">Feb 13, 2026</div><div class="visit-amount">55,000đ</div></div>
+      </div>
+
+      <div class="insight-card">
+        <div class="insight-icon" style="background: var(--orange-dim);">💡</div>
+        <div class="insight-text">
+          <h4>Pal's Note</h4>
+          <p>You visit every ~3 days, usually midmorning. Trà sữa Oolong is your go-to. At Highlands, the same drink is 39K — that's 96K/month savings.</p>
+        </div>
+      </div>
+
+      <div class="pd-similar">
+        <h4>Similar places nearby</h4>
+        <div class="similar-place">
+          <div class="similar-icon" style="background: var(--blue-dim);">☕</div>
+          <div class="similar-info">
+            <div class="similar-name">The Coffee House - Lý Tự Trọng</div>
+            <div class="similar-detail">350m away · ⭐ 4.2 · Avg 42K</div>
+          </div>
+          <div class="similar-tag">-24%</div>
+        </div>
+        <div class="similar-place">
+          <div class="similar-icon" style="background: var(--accent-dim);">☕</div>
+          <div class="similar-info">
+            <div class="similar-name">Highlands Coffee - Nguyễn Huệ</div>
+            <div class="similar-detail">120m away · ⭐ 4.0 · Avg 39K</div>
+          </div>
+          <div class="similar-tag">-29%</div>
+        </div>
+        <div class="similar-place">
+          <div class="similar-icon" style="background: var(--purple-dim);">🫖</div>
+          <div class="similar-info">
+            <div class="similar-name">Katinat Saigon Kafe</div>
+            <div class="similar-detail">450m away · ⭐ 4.4 · Avg 60K</div>
+          </div>
+          <div class="similar-tag">+9%</div>
+        </div>
+      </div>
+
+      <div style="height: 20px;"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Navigation
+  function goTo(screenId, stepIdx) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screenId).classList.add('active');
+    if (screenId === 'onboardScreen' && stepIdx !== undefined) showStep(stepIdx);
+  }
+
+  // Onboarding
+  let currentStep = 0;
+  function showStep(idx) {
+    currentStep = idx;
+    document.querySelectorAll('.onboard-step').forEach(s => s.classList.remove('active'));
+    document.getElementById('step' + idx).classList.add('active');
+    for (let i = 0; i < 3; i++) document.getElementById('dot' + i).classList.toggle('filled', i <= idx);
+  }
+  function selectOption(btn, step) {
+    btn.parentElement.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    setTimeout(() => { if (step < 2) showStep(step + 1); }, 300);
+  }
+  function toggleGoal(btn) { btn.classList.toggle('selected'); }
+
+  // Chat
+  const chatArea = document.getElementById('chatArea');
+  function addMessage(content, delay = 0) {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        const div = document.createElement('div');
+        div.innerHTML = content;
+        chatArea.appendChild(div);
+        chatArea.scrollTop = chatArea.scrollHeight;
+        resolve();
+      }, delay);
+    });
+  }
+  function showTyping() {
+    return addMessage(`<div class="msg bot" id="typingIndicator"><div class="msg-bubble"><div class="typing"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div></div>`);
+  }
+  function hideTyping() { const t = document.getElementById('typingIndicator'); if (t) t.remove(); }
+
+  // Voice
+  let voiceInterval;
+  let voiceSeconds = 0;
+  function startVoice() {
+    document.getElementById('voiceOverlay').classList.add('active');
+    document.getElementById('chatInputBar').style.display = 'none';
+    document.getElementById('micBtn').classList.add('recording');
+    voiceSeconds = 0;
+    document.getElementById('voiceTimer').textContent = '0:00';
+    document.getElementById('voiceTranscript').textContent = 'Listening...';
+    document.getElementById('voiceSendBtn').className = 'voice-send';
+    document.getElementById('voiceSendBtn').innerHTML = '⏹';
+
+    voiceInterval = setInterval(() => {
+      voiceSeconds++;
+      const m = Math.floor(voiceSeconds / 60);
+      const s = voiceSeconds % 60;
+      document.getElementById('voiceTimer').textContent = `${m}:${s.toString().padStart(2, '0')}`;
+
+      if (voiceSeconds === 2) {
+        document.getElementById('voiceTranscript').textContent = '"sáu mươi lăm nghìn..."';
+      }
+      if (voiceSeconds === 3) {
+        document.getElementById('voiceTranscript').textContent = '"sáu mươi lăm nghìn tại highlands..."';
+      }
+      if (voiceSeconds === 4) {
+        document.getElementById('voiceTranscript').textContent = '"sáu mươi lăm nghìn tại highlands một latte"';
+        document.getElementById('voiceSendBtn').className = 'voice-send done';
+        document.getElementById('voiceSendBtn').innerHTML = '↑';
+      }
+    }, 1000);
+  }
+  function cancelVoice() {
+    clearInterval(voiceInterval);
+    document.getElementById('voiceOverlay').classList.remove('active');
+    document.getElementById('chatInputBar').style.display = 'flex';
+    document.getElementById('micBtn').classList.remove('recording');
+  }
+  async function sendVoice() {
+    clearInterval(voiceInterval);
+    document.getElementById('voiceOverlay').classList.remove('active');
+    document.getElementById('chatInputBar').style.display = 'flex';
+    document.getElementById('micBtn').classList.remove('recording');
+
+    await addMessage(`<div class="msg user"><div class="msg-bubble">🎤 "sáu mươi lăm nghìn tại highlands một latte"</div><div class="msg-time">10:35 AM</div></div>`);
+    await showTyping();
+    await new Promise(r => setTimeout(r, 1500));
+    hideTyping();
+    await addMessage(`
+      <div class="receipt-card">
+        <div class="receipt-header">
+          <div>
+            <div class="receipt-merchant">Highlands Coffee - Nguyễn Huệ</div>
+            <div class="receipt-date">Feb 28, 2026 · 10:35 AM</div>
+          </div>
+          <div class="receipt-tag">☕ Café</div>
+        </div>
+        <div class="receipt-items">
+          <div class="receipt-item"><span class="name">Latte</span><span class="price">65,000đ</span></div>
+        </div>
+        <div class="receipt-total"><span class="label">Total</span><span class="amount">65,000đ</span></div>
+        <div class="receipt-location" onclick="goTo('placeDetailScreen')">
+          <span class="loc-icon">📍</span>
+          120 Nguyễn Huệ, Q1 · 120m from Phúc Long
+          <span class="loc-rating">⭐ 4.0</span>
+        </div>
+        <div class="receipt-actions">
+          <button class="btn-confirm" onclick="confirmVoice()">✅ Correct</button>
+          <button class="btn-edit">✏️ Edit</button>
+        </div>
+      </div>
+    `);
+  }
+  async function confirmVoice() {
+    await addMessage(`<div class="msg user"><div class="msg-bubble">✅ Confirmed</div><div class="msg-time">10:35 AM</div></div>`);
+    await showTyping();
+    await new Promise(r => setTimeout(r, 1000));
+    hideTyping();
+    await addMessage(`<div class="msg bot"><div class="msg-bubble">Saved! That's 65K at Highlands — 10K more than your usual Phúc Long latte. Switching back would save ~300K/month ☕<br><br><span style="color: var(--text-dim); font-size: 12px;">12 free scans remaining</span></div><div class="msg-time">10:36 AM</div></div>`);
+  }
+
+  // Photo upload simulation
+  async function simulateUpload() {
+    await addMessage(`<div class="upload-preview"><div class="upload-img"><div class="receipt-emoji">🧾</div><div>receipt_photo.jpg</div><div class="scan-line"></div></div><div class="msg-time" style="text-align: right; margin-top: 4px;">10:32 AM</div></div>`);
+    await showTyping();
+    await new Promise(r => setTimeout(r, 2200));
+    hideTyping();
+    await addMessage(`<div class="msg bot"><div class="msg-bubble">Got it! Scanning... 🔍</div></div>`);
+    await showTyping();
+    await new Promise(r => setTimeout(r, 1500));
+    hideTyping();
+    await addMessage(`
+      <div class="receipt-card">
+        <div class="receipt-header">
+          <div>
+            <div class="receipt-merchant">Phúc Long - Nguyễn Huệ</div>
+            <div class="receipt-date">Feb 27, 2026 · 10:28 AM</div>
+          </div>
+          <div class="receipt-tag">☕ Café</div>
+        </div>
+        <div class="receipt-items">
+          <div class="receipt-item"><span class="name">Trà sữa Oolong (L)</span><span class="price">55,000đ</span></div>
+          <div class="receipt-item"><span class="name">Bánh mì thịt</span><span class="price">35,000đ</span></div>
+          <div class="receipt-item uncertain"><span class="name">Trà đào cam sả (M)?</span><span class="price">45,000đ</span></div>
+        </div>
+        <div class="receipt-total"><span class="label">Total</span><span class="amount">135,000đ</span></div>
+        <div class="receipt-location" onclick="goTo('placeDetailScreen')">
+          <span class="loc-icon">📍</span>
+          123 Nguyễn Huệ, Bến Nghé, Quận 1
+          <span class="loc-rating">⭐ 4.3</span>
+        </div>
+        <div class="receipt-actions">
+          <button class="btn-confirm" onclick="confirmReceipt()">✅ Correct</button>
+          <button class="btn-edit">✏️ Edit</button>
+        </div>
+      </div>
+    `);
+  }
+  async function confirmReceipt() {
+    await addMessage(`<div class="msg user"><div class="msg-bubble">✅ Confirmed</div><div class="msg-time">10:33 AM</div></div>`);
+    await showTyping();
+    await new Promise(r => setTimeout(r, 1000));
+    hideTyping();
+    await addMessage(`<div class="msg bot"><div class="msg-bubble">Saved! 🎉 That's your 8th visit to Phúc Long this month. You've spent <strong>440K</strong> here in Feb.<br><br>Quick note — 3rd boba this week. 🧋<br><br><span style="color: var(--text-dim); font-size: 12px;">11 free scans remaining</span></div><div class="msg-time">10:33 AM</div></div>`);
+  }
+
+  // Free-form chat
+  function handleChatSend() {
+    const input = document.getElementById('chatInput');
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    addMessage(`<div class="msg user"><div class="msg-bubble">${text}</div><div class="msg-time">Now</div></div>`).then(async () => {
+      await showTyping();
+      await new Promise(r => setTimeout(r, 1800));
+      hideTyping();
+      let reply = "I found 4 receipts with sushi this month. You've spent 1.2M VND — your favorite is Sushi Hokkaido (3 visits, avg 320K). Similar spots nearby: Sushi Ko (250K avg, ⭐4.4) and Isushi (180K avg, ⭐4.0).";
+      if (text.toLowerCase().includes('coffee') || text.toLowerCase().includes('cà phê'))
+        reply = "You've spent 825K on coffee across 15 purchases. Top spots: Phúc Long (8x, 55K avg), Highlands (4x, 45K avg), The Coffee House (3x, 42K avg). Phúc Long is priciest — switching to TCH saves ~130K/month.";
+      else if (text.toLowerCase().includes('map') || text.toLowerCase().includes('where'))
+        reply = "You've visited 23 places this month across Q1, Q3, and Bình Thạnh. 60% of your spending is within 500m of your office. Tap 📍 to see your food map!";
+      else if (text.toLowerCase().includes('health') || text.toLowerCase().includes('eat'))
+        reply = "Feb food snapshot:<br>🟢 Good variety — 12 restaurants<br>🟡 Sugary drinks trending up (6x/week)<br>🔴 Fast food 5x this week (2x your usual)<br><br>Healthiest week was W1. Want me to track sugar drinks?";
+      await addMessage(`<div class="msg bot"><div class="msg-bubble">${reply}</div><div class="msg-time">Now</div></div>`);
+    });
+  }
+
+  // Map filter clicks
+  document.querySelectorAll('.map-filter').forEach(f => {
+    f.addEventListener('click', () => {
+      document.querySelectorAll('.map-filter').forEach(b => b.classList.remove('active'));
+      f.classList.add('active');
+    });
+  });
+  // Period toggle clicks
+  document.querySelectorAll('.period-btn').forEach(f => {
+    f.addEventListener('click', () => {
+      document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+      f.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>

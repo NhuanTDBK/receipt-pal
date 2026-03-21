@@ -36,7 +36,9 @@ from app.config import settings  # noqa: E402
 async def _call(client: AsyncOpenAI) -> None:
     _span = otel_trace.get_current_span()
     if _span.is_recording():
-        _span.set_attribute(LangfuseOtelSpanAttributes.TRACE_SESSION_ID, "test-session-123")
+        _span.set_attribute(
+            LangfuseOtelSpanAttributes.TRACE_SESSION_ID, "test-session-123"
+        )
         _span.set_attribute(LangfuseOtelSpanAttributes.TRACE_USER_ID, "test-user-456")
 
     stream = await client.chat.completions.create(

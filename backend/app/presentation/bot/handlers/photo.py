@@ -34,9 +34,7 @@ async def _get_or_download_image(bot: Bot, file_id: str) -> bytes | None:
         file = await bot.get_file(file_id)
         image_bytes = await bot.download_file(file.file_path)
         data = (
-            image_bytes.read()
-            if hasattr(image_bytes, "read")
-            else bytes(image_bytes)
+            image_bytes.read() if hasattr(image_bytes, "read") else bytes(image_bytes)
         )
         photo_store.store(file_id, data)
         return data
@@ -75,12 +73,22 @@ async def _process_receipt(
 
     if is_pdf:
         await run_agent(
-            bot, message, status_msg, session, state, user_text,
+            bot,
+            message,
+            status_msg,
+            session,
+            state,
+            user_text,
             pdfs=media_bytes,
         )
     else:
         await run_agent(
-            bot, message, status_msg, session, state, user_text,
+            bot,
+            message,
+            status_msg,
+            session,
+            state,
+            user_text,
             images=media_bytes,
         )
 
@@ -122,6 +130,7 @@ async def handle_photo(
                         exc,
                     )
                     from app.presentation.bot.bot import get_bot_manager
+
                     try:
                         await get_bot_manager().send_message(
                             chat_id=message.chat.id,

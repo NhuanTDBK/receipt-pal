@@ -31,20 +31,20 @@ def _ensure_provider_configured() -> None:
 
 
 def _encode_image(image_bytes: bytes) -> dict:
-    """Encode image bytes as a base64 image_url content part."""
+    """Encode image bytes as a base64 input_image content part (SDK format)."""
     b64 = base64.b64encode(image_bytes).decode("utf-8")
     return {
-        "type": "image_url",
-        "image_url": {"url": f"data:image/jpeg;base64,{b64}"},
+        "type": "input_image",
+        "image_url": f"data:image/jpeg;base64,{b64}",
     }
 
 
 def _encode_pdf(pdf_bytes: bytes) -> dict:
-    """Encode PDF bytes as a base64 content part."""
+    """Encode PDF bytes as a base64 input_image content part (SDK format)."""
     b64 = base64.b64encode(pdf_bytes).decode("utf-8")
     return {
-        "type": "image_url",
-        "image_url": {"url": f"data:application/pdf;base64,{b64}"},
+        "type": "input_image",
+        "image_url": f"data:application/pdf;base64,{b64}",
     }
 
 
@@ -52,17 +52,18 @@ def _build_input(
     text: str | None,
     images: list[bytes] | None = None,
     pdfs: list[bytes] | None = None,
-) -> str | dict:
+) -> str | list[dict]:
     """Build the input for Runner.run().
 
-    Returns a plain string for text-only input, or an EasyInputMessageParam
-    dict ({"role": "user", "content": [...]}) for multimodal input so the SDK
-    receives a valid TResponseInputItem rather than bare content-part dicts.
+    Returns a plain string for text-only input, or a list containing one
+    EasyInputMessageParam dict ({"role": "user", "content": [...]}) for
+    multimodal input. Runner.run() expects str | list[TResponseInputItem];
+    passing a bare dict causes the SDK to iterate over its keys.
     """
     content_parts: list[dict] = []
 
     if text:
-        content_parts.append({"type": "text", "text": text})
+        content_parts.append({"type": "input_text", "text": text})
 
     for img in images or []:
         content_parts.append(_encode_image(img))
@@ -73,10 +74,10 @@ def _build_input(
     if not content_parts:
         return "."
 
-    if len(content_parts) == 1 and content_parts[0].get("type") == "text":
+    if len(content_parts) == 1 and content_parts[0].get("type") == "input_text":
         return content_parts[0]["text"]
 
-    return {"role": "user", "content": content_parts}
+    return [{"role": "user", "content": content_parts}]
 
 
 async def run_agent(

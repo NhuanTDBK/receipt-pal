@@ -5,6 +5,7 @@ Revises: a1b2c3d4e5f6
 Create Date: 2026-03-20 17:45:00.000000
 
 """
+
 from typing import Sequence, Union
 
 import sqlalchemy as sa
@@ -20,11 +21,23 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     op.create_table(
         "user_settings",
-        sa.Column("user_id", UUID(as_uuid=True), sa.ForeignKey("users.id", ondelete="CASCADE"), primary_key=True),
+        sa.Column(
+            "user_id",
+            UUID(as_uuid=True),
+            sa.ForeignKey("users.id", ondelete="CASCADE"),
+            primary_key=True,
+        ),
         sa.Column("language", sa.String(10), nullable=False, server_default="vi"),
-        sa.Column("response_preference", sa.String(20), nullable=False, server_default="concise"),
+        sa.Column(
+            "response_preference",
+            sa.String(20),
+            nullable=False,
+            server_default="concise",
+        ),
         sa.Column("location", sa.String(200), nullable=True),
-        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
+        sa.Column(
+            "updated_at", sa.DateTime(timezone=True), server_default=sa.func.now()
+        ),
     )
 
     op.create_table(
@@ -37,7 +50,9 @@ def upgrade() -> None:
             nullable=False,
         ),
         sa.Column("content", sa.Text(), nullable=False),
-        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
+        sa.Column(
+            "created_at", sa.DateTime(timezone=True), server_default=sa.func.now()
+        ),
     )
     op.create_index("ix_memories_user_id", "memories", ["user_id"])
 

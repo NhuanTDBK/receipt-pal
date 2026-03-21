@@ -1,0 +1,37 @@
+{
+  "merchant": {
+    "name": "Phê La",
+    "address": "Thành Thái"
+  },
+  "datetime": "2025-05-22T10:00:00Z",
+  "billing_period": "2025-05",
+  "items": [
+    {
+      "name": "Gấm",
+      "amount": 60000,
+      "name_raw": "Gấm",
+      "quantity": 1,
+      "unit_price": 60000,
+      "confidence": "high",
+      "toppings": [],
+      "modifiers": {
+        "sugar_level": "vừa",
+        "ice_level": "vừa",
+        "size": "vừa"
+      },
+      "food_tags": [
+        "sugary",
+        "caffeine"
+      ],
+      "id": 1
+    }
+  ],
+  "subtotal": 60000,
+  "discount": 0,
+  "tax_rate": 0.0,
+  "tax_amount": 0,
+  "total": 60000,
+  "currency": "VND",
+  "category": "cafe",
+  "source": "paper"
+}

@@ -1,0 +1,48 @@
+{
+  "items": [
+    {
+      "food_tags": [
+        "sugary"
+      ],
+      "confidence": "high",
+      "name": "Brioche 200Gr",
+      "quantity": 1,
+      "name_raw": "Brioche 200Gr",
+      "amount": 68000,
+      "unit_price": 68000
+    },
+    {
+      "name": "Cannelés Coffee",
+      "food_tags": [
+        "caffeine",
+        "sugary"
+      ],
+      "confidence": "high",
+      "quantity": 1,
+      "amount": 40000,
+      "name_raw": "Cannelles Coffee",
+      "unit_price": 40000
+    },
+    {
+      "unit_price": 75000,
+      "quantity": 1,
+      "amount": 75000,
+      "name_raw": "Millefeuille Classic 1P",
+      "name": "Millefeuille Classic 1P",
+      "confidence": "high",
+      "food_tags": [
+        "sugary"
+      ]
+    }
+  ],
+  "merchant": {
+    "name": "Saint Honoré",
+    "address": "Lotte Vo Chi Cong, Tay Ho, HN"
+  },
+  "datetime": "2025-03-15T18:43:00",
+  "category": "cafe",
+  "currency": "VND",
+  "source": "paper",
+  "mode": "final",
+  "total": 183000
+}

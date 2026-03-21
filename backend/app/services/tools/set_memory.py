@@ -25,8 +25,11 @@ async def set_memory(
         user_id=ctx.context.user_id,
         content=content,
     )
-    return json.dumps({
-        "status": "saved",
-        "content": content,
-        "created_at": memory.created_at.isoformat() if memory.created_at else None,
-    }, ensure_ascii=False)
+    return json.dumps(
+        {
+            "status": "saved",
+            "content": content,
+            "created_at": memory.created_at.isoformat() if memory.created_at else None,
+        },
+        ensure_ascii=False,
+    )
