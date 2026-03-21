@@ -17,7 +17,8 @@ if [ ! -f "$APP_DIR/backend/.env" ]; then
 fi
 
 echo "Fetching latest changes from origin..."
-git fetch --tags origin main
+git fetch origin main
+git fetch --force --tags origin
 
 if [ -n "$REQUESTED_TAG" ]; then
   DEPLOY_REF="$REQUESTED_TAG"
