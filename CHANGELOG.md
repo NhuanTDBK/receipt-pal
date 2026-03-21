@@ -5,6 +5,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [v2.1.2] — 2026-03-21
+
+### Fixed
+- **Multimodal input format for OpenAI Agents SDK** — `_build_input()` was using Chat Completions content-part types (`text`, `image_url` with nested `{url}` dict) which the SDK's `Converter.items_to_messages()` does not recognise. Parts are now formatted using SDK-native types: `input_text` and `input_image` with a plain string `image_url`. The multimodal message is also wrapped in a list (`list[TResponseInputItem]`) instead of a bare dict, which previously caused the SDK to iterate over dict keys and raise `UserError: Unhandled item type or structure: role`.
+
+---
+
 ## [v2.1.1] — 2026-03-21
 
 ### Fixed
