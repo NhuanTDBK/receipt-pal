@@ -17,8 +17,14 @@ async def ask_user(
     options: list[str],
     allow_skip: bool = True,
     field: Literal[
-        "total", "date", "merchant", "category", "line_item", "edit_selection",
-    ] | None = None,
+        "total",
+        "date",
+        "merchant",
+        "category",
+        "line_item",
+        "edit_selection",
+    ]
+    | None = None,
 ) -> str:
     """Ask one clarification question and display options to the user.
 

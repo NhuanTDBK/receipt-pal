@@ -1,0 +1,36 @@
+{
+  "merchant": {
+    "name": "Hàng Lược",
+    "address": "Hàng Lược"
+  },
+  "datetime": "2025-05-22T00:00:00Z",
+  "billing_period": "2025-05",
+  "items": [
+    {
+      "name": "Ốc",
+      "amount": 100000,
+      "name_raw": "Ốc",
+      "quantity": 1,
+      "unit_price": 100000,
+      "confidence": "high",
+      "toppings": [],
+      "modifiers": {
+        "sugar_level": "n/a",
+        "ice_level": "n/a",
+        "size": "n/a"
+      },
+      "food_tags": [
+        "fried"
+      ],
+      "id": 1
+    }
+  ],
+  "subtotal": 100000,
+  "discount": 0,
+  "tax_rate": 0.0,
+  "tax_amount": 0,
+  "total": 100000,
+  "currency": "VND",
+  "category": "dining",
+  "source": "paper"
+}

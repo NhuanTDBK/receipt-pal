@@ -48,9 +48,7 @@ async def callback_confirm(
 
 
 @router.callback_query(F.data == "receipt:edit")
-async def callback_edit(
-    callback: CallbackQuery, state: FSMContext
-) -> None:
+async def callback_edit(callback: CallbackQuery, state: FSMContext) -> None:
     data = await state.get_data()
     draft = data.get("draft", {})
     if not draft:
@@ -59,15 +57,12 @@ async def callback_edit(
 
     await state.set_state(ReceiptFlow.EDITING_FIELD)
     await callback.message.answer(
-        "✏️ Describe what to change "
-        "(e.g. \"merchant is Starbucks\" or \"total is 55000\"):"
+        '✏️ Describe what to change (e.g. "merchant is Starbucks" or "total is 55000"):'
     )
 
 
 @router.callback_query(F.data == "receipt:cancel")
-async def callback_cancel(
-    callback: CallbackQuery, state: FSMContext
-) -> None:
+async def callback_cancel(callback: CallbackQuery, state: FSMContext) -> None:
     await callback.message.edit_text("❌ Receipt discarded.")
     await state.clear()
 
@@ -87,7 +82,11 @@ async def callback_ask_user(
     )
 
     await run_agent(
-        bot, callback.message, status_msg, session, state,
+        bot,
+        callback.message,
+        status_msg,
+        session,
+        state,
         user_input=selected_text,
     )
 
@@ -108,6 +107,10 @@ async def handle_edit_input(
     status_msg = await message.answer("🔄 Updating receipt...")
 
     await run_agent(
-        bot, message, status_msg, session, state,
+        bot,
+        message,
+        status_msg,
+        session,
+        state,
         user_input=message.text,
     )

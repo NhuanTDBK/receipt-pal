@@ -1,0 +1,36 @@
+{
+  "merchant": {
+    "name": "Công viên Cầu Giấy",
+    "address": "Công viên Cầu Giấy"
+  },
+  "datetime": "2025-05-15T15:00:00",
+  "billing_period": "2025-05",
+  "items": [
+    {
+      "name": "Bánh tráng",
+      "amount": 20000,
+      "name_raw": "bánh tráng",
+      "quantity": 1,
+      "unit_price": 20000,
+      "confidence": "high",
+      "toppings": [],
+      "modifiers": {
+        "sugar_level": "N/A",
+        "ice_level": "N/A",
+        "size": "N/A"
+      },
+      "food_tags": [
+        "sugary"
+      ],
+      "id": 1
+    }
+  ],
+  "subtotal": 20000,
+  "discount": 0,
+  "tax_rate": 0.0,
+  "tax_amount": 0,
+  "total": 20000,
+  "currency": "VND",
+  "category": "dining",
+  "source": "paper"
+}

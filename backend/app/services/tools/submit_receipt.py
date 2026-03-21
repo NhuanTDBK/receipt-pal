@@ -45,8 +45,14 @@ class ReceiptItem(BaseModel):
     modifiers: ItemModifiers | None = None
     food_tags: list[
         Literal[
-            "sugary", "fried", "healthy", "alcohol",
-            "caffeine", "dairy", "spicy", "non_food",
+            "sugary",
+            "fried",
+            "healthy",
+            "alcohol",
+            "caffeine",
+            "dairy",
+            "spicy",
+            "non_food",
         ]
     ] = []
 
@@ -64,12 +70,28 @@ class ReceiptData(BaseModel):
     tax_amount: int | None = None
     total: int | None = None
     currency: str = "VND"
-    category: Literal[
-        "dining", "cafe", "grocery", "convenience", "health",
-        "entertainment", "transport", "utilities", "rent", "other",
-    ] | None = None
+    category: (
+        Literal[
+            "dining",
+            "cafe",
+            "grocery",
+            "convenience",
+            "health",
+            "entertainment",
+            "transport",
+            "utilities",
+            "rent",
+            "other",
+        ]
+        | None
+    ) = None
     source: Literal[
-        "paper", "shopeefood", "grabfood", "gofood", "baemin", "app_unknown",
+        "paper",
+        "shopeefood",
+        "grabfood",
+        "gofood",
+        "baemin",
+        "app_unknown",
     ] = "paper"
 
 

@@ -11,18 +11,29 @@ from app.database import Base
 class Receipt(Base):
     __tablename__ = "receipts"
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
     user_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+        UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
     )
     conversation_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("conversations.id", ondelete="SET NULL"), nullable=True
+        UUID(as_uuid=True),
+        ForeignKey("conversations.id", ondelete="SET NULL"),
+        nullable=True,
     )
 
     merchant_name: Mapped[str] = mapped_column(String(255), nullable=False)
     merchant_address: Mapped[str | None] = mapped_column(String(500), nullable=True)
-    receipt_datetime: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-    billing_period: Mapped[str | None] = mapped_column(String(20), nullable=True)  # "2025-03"
+    receipt_datetime: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    billing_period: Mapped[str | None] = mapped_column(
+        String(20), nullable=True
+    )  # "2025-03"
 
     category: Mapped[str] = mapped_column(String(50), nullable=False, default="other")
     source: Mapped[str] = mapped_column(String(50), nullable=False, default="paper")
@@ -35,10 +46,14 @@ class Receipt(Base):
     currency: Mapped[str] = mapped_column(String(10), nullable=False, default="VND")
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
 
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
 
     user: Mapped["User"] = relationship(back_populates="receipts")
-    conversation: Mapped["Conversation | None"] = relationship(back_populates="receipts")
+    conversation: Mapped["Conversation | None"] = relationship(
+        back_populates="receipts"
+    )
     items: Mapped[list["ReceiptItem"]] = relationship(
         back_populates="receipt", cascade="all, delete-orphan"
     )
@@ -47,7 +62,9 @@ class Receipt(Base):
 class ReceiptItem(Base):
     __tablename__ = "receipt_items"
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
     receipt_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("receipts.id", ondelete="CASCADE"),

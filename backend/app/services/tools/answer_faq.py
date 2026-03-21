@@ -15,7 +15,9 @@ from agents import RunContextWrapper, function_tool
 
 from app.services.agent_context import TelegramAgentContext
 
-_FAQ_PATH = Path(__file__).resolve().parent.parent.parent.parent.parent / "docs" / "faq.md"
+_FAQ_PATH = (
+    Path(__file__).resolve().parent.parent.parent.parent.parent / "docs" / "faq.md"
+)
 
 
 def _load_corpus() -> str:
@@ -34,10 +36,12 @@ def _extract_entries(corpus: str) -> list[dict[str, str]]:
         re.DOTALL,
     )
     for match in pattern.finditer(corpus):
-        entries.append({
-            "question": match.group("question").strip(),
-            "answer": match.group("answer").strip(),
-        })
+        entries.append(
+            {
+                "question": match.group("question").strip(),
+                "answer": match.group("answer").strip(),
+            }
+        )
     return entries
 
 

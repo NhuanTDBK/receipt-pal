@@ -1,0 +1,36 @@
+{
+  "merchant": {
+    "name": "Chợ Dịch Vọng Hậu",
+    "address": "chợ Dịch Vọng Hậu, Hà Nội"
+  },
+  "datetime": "2025-05-22T10:00:00Z",
+  "billing_period": "2025-05",
+  "items": [
+    {
+      "name": "thịt bò",
+      "amount": 100000,
+      "name_raw": "thịt bò",
+      "quantity": 1,
+      "unit_price": 100000,
+      "confidence": "high",
+      "toppings": [],
+      "modifiers": {
+        "sugar_level": "N/A",
+        "ice_level": "N/A",
+        "size": "N/A"
+      },
+      "food_tags": [
+        "healthy"
+      ],
+      "id": 1
+    }
+  ],
+  "subtotal": 100000,
+  "discount": 0,
+  "tax_rate": 0.0,
+  "tax_amount": 0,
+  "total": 100000,
+  "currency": "VND",
+  "category": "grocery",
+  "source": "paper"
+}

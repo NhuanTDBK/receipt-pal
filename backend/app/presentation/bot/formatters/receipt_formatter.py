@@ -76,12 +76,16 @@ def format_receipt_card(receipt: dict, is_draft: bool = True) -> str:
         qty_str = f"{qty}× " if qty > 1 else ""
         id_str = f"[{item_id}] " if item_id != "" else ""
         amount_str = format_currency(amount, currency)
-        lines.append(f"  {id_str}{qty_str}<i>{_esc(item_name)}</i> — {amount_str} {conf_icon}")
+        lines.append(
+            f"  {id_str}{qty_str}<i>{_esc(item_name)}</i> — {amount_str} {conf_icon}"
+        )
 
         for topping in item.get("toppings") or []:
             tp_name = topping.get("name", "")
             tp_price = topping.get("price", 0)
-            price_str = f"+{format_currency(tp_price, currency)}" if tp_price else "free"
+            price_str = (
+                f"+{format_currency(tp_price, currency)}" if tp_price else "free"
+            )
             lines.append(f"    + {_esc(tp_name)} ({price_str})")
 
         modifiers = item.get("modifiers") or {}

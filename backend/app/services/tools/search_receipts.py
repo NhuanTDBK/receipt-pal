@@ -20,8 +20,13 @@ from app.services.agent_context import TelegramAgentContext
 @function_tool
 async def search_receipts(
     ctx: RunContextWrapper[TelegramAgentContext],
-    query: Annotated[str, "Keyword or phrase to search for (merchant name, item name, category, …)"],
-    category: Annotated[str | None, "Optional category filter: dining, cafe, grocery, convenience, health, entertainment, transport, utilities, rent, other"] = None,
+    query: Annotated[
+        str, "Keyword or phrase to search for (merchant name, item name, category, …)"
+    ],
+    category: Annotated[
+        str | None,
+        "Optional category filter: dining, cafe, grocery, convenience, health, entertainment, transport, utilities, rent, other",
+    ] = None,
     limit: Annotated[int, "Maximum number of receipts to return (1–20)"] = 10,
 ) -> str:
     """Search the user's receipts by keyword and optional category filter.
@@ -45,13 +50,17 @@ async def search_receipts(
 
     if query.strip():
         q = f"%{query.strip()}%"
-        stmt = stmt.join(Receipt.items, isouter=True).where(
-            or_(
-                Receipt.merchant_name.ilike(q),
-                Receipt.category.ilike(q),
-                ReceiptItem.name.ilike(q),
+        stmt = (
+            stmt.join(Receipt.items, isouter=True)
+            .where(
+                or_(
+                    Receipt.merchant_name.ilike(q),
+                    Receipt.category.ilike(q),
+                    ReceiptItem.name.ilike(q),
+                )
             )
-        ).distinct()
+            .distinct()
+        )
 
     stmt = stmt.order_by(Receipt.receipt_datetime.desc()).limit(limit)
     result = await session.execute(stmt)
@@ -59,26 +68,30 @@ async def search_receipts(
 
     results = []
     for r in receipts:
-        results.append({
-            "id": str(r.id),
-            "merchant": r.merchant_name,
-            "address": r.merchant_address,
-            "date": r.receipt_datetime.isoformat() if r.receipt_datetime else None,
-            "category": r.category,
-            "total": r.total,
-            "currency": r.currency,
-            "items": [
-                {
-                    "name": item.name,
-                    "quantity": item.quantity,
-                    "amount": item.amount,
-                    "food_tags": item.food_tags or [],
-                }
-                for item in r.items
-            ],
-        })
+        results.append(
+            {
+                "id": str(r.id),
+                "merchant": r.merchant_name,
+                "address": r.merchant_address,
+                "date": r.receipt_datetime.isoformat() if r.receipt_datetime else None,
+                "category": r.category,
+                "total": r.total,
+                "currency": r.currency,
+                "items": [
+                    {
+                        "name": item.name,
+                        "quantity": item.quantity,
+                        "amount": item.amount,
+                        "food_tags": item.food_tags or [],
+                    }
+                    for item in r.items
+                ],
+            }
+        )
 
     if not results:
-        return json.dumps({"found": 0, "receipts": [], "note": "No receipts matched the search."})
+        return json.dumps(
+            {"found": 0, "receipts": [], "note": "No receipts matched the search."}
+        )
 
     return json.dumps({"found": len(results), "receipts": results}, ensure_ascii=False)

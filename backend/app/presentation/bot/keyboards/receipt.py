@@ -12,7 +12,9 @@ def receipt_review_keyboard() -> InlineKeyboardMarkup:
     return builder.as_markup()
 
 
-def ask_user_keyboard(options: list[str], allow_skip: bool = True) -> InlineKeyboardMarkup:
+def ask_user_keyboard(
+    options: list[str], allow_skip: bool = True
+) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     for i, option in enumerate(options):
         builder.button(text=option, callback_data=f"ask:{i}:{option[:50]}")

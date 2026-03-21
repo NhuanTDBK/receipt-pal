@@ -147,8 +147,7 @@ async def cmd_usage(message: Message, session: AsyncSession) -> None:
 
     if stats["total_tokens"] == 0:
         await message.answer(
-            "No token usage yet. Send a receipt photo or PDF "
-            "to get started! 📸"
+            "No token usage yet. Send a receipt photo or PDF to get started! 📸"
         )
         return
 
@@ -198,13 +197,15 @@ async def fallback_text(
     "what's my spending this month?", or general questions.
     """
     if not message.text:
-        await message.answer(
-            "📸 Send me a photo or PDF of a receipt to get started!"
-        )
+        await message.answer("📸 Send me a photo or PDF of a receipt to get started!")
         return
 
     status_msg = await message.answer("🤔 Processing...")
     await run_agent(
-        bot, message, status_msg, session, state,
+        bot,
+        message,
+        status_msg,
+        session,
+        state,
         user_input=message.text,
     )

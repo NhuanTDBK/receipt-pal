@@ -95,8 +95,9 @@ def _serialize(value: object) -> object:
     if hasattr(value, "_mapping"):
         return {k: _serialize(v) for k, v in value._mapping.items()}
     if hasattr(value, "__dict__"):
-        return {k: _serialize(v) for k, v in vars(value).items()
-                if not k.startswith("_")}
+        return {
+            k: _serialize(v) for k, v in vars(value).items() if not k.startswith("_")
+        }
     return str(value)
 
 
@@ -129,10 +130,12 @@ async def run_query(
     """
     offending = _check_for_write_ops(query_code)
     if offending:
-        return json.dumps({
-            "error": f"Disallowed operation detected: '{offending}'. "
-                     "Only read-only SELECT patterns are permitted."
-        })
+        return json.dumps(
+            {
+                "error": f"Disallowed operation detected: '{offending}'. "
+                "Only read-only SELECT patterns are permitted."
+            }
+        )
 
     user_id = ctx.context.user_id
     local_ns: dict = {}

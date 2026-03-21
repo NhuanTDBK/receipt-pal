@@ -32,10 +32,21 @@ class ReceiptPatch(BaseModel):
 
     merchant: MerchantInfo | None = None
     datetime: str | None = None
-    category: Literal[
-        "dining", "cafe", "grocery", "convenience", "health",
-        "entertainment", "transport", "utilities", "rent", "other",
-    ] | None = None
+    category: (
+        Literal[
+            "dining",
+            "cafe",
+            "grocery",
+            "convenience",
+            "health",
+            "entertainment",
+            "transport",
+            "utilities",
+            "rent",
+            "other",
+        ]
+        | None
+    ) = None
     currency: str | None = None
     subtotal: int | None = None
     discount: int | None = None

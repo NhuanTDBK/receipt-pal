@@ -43,6 +43,7 @@ async def check_redis() -> None:
 
     try:
         import redis.asyncio as aioredis
+
         client = aioredis.from_url(settings.redis_url, socket_connect_timeout=3)
         await client.ping()
         await client.aclose()
