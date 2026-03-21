@@ -52,11 +52,12 @@ def _build_input(
     text: str | None,
     images: list[bytes] | None = None,
     pdfs: list[bytes] | None = None,
-) -> str | list[dict]:
+) -> str | dict:
     """Build the input for Runner.run().
 
-    Returns a simple string if text-only, or a list of content parts
-    if media is included.
+    Returns a plain string for text-only input, or an EasyInputMessageParam
+    dict ({"role": "user", "content": [...]}) for multimodal input so the SDK
+    receives a valid TResponseInputItem rather than bare content-part dicts.
     """
     content_parts: list[dict] = []
 
@@ -75,7 +76,7 @@ def _build_input(
     if len(content_parts) == 1 and content_parts[0].get("type") == "text":
         return content_parts[0]["text"]
 
-    return content_parts
+    return {"role": "user", "content": content_parts}
 
 
 async def run_agent(
