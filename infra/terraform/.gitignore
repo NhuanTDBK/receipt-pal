@@ -11,6 +11,11 @@
 .terraform/
 .terraform.lock.hcl
 
+# Terraform plan output — contains all variable values in plaintext,
+# including sensitive ones (sensitive = true only suppresses terminal output).
+tfplan
+*.tfplan
+
 # Crash logs
 crash.log
 crash.*.log
