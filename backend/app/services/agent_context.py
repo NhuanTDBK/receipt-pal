@@ -25,3 +25,4 @@ class TelegramAgentContext:
     user_id: uuid.UUID
     conversation_id: uuid.UUID
     draft: dict | None = None
+    suppress_final_text: bool = False

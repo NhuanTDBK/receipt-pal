@@ -32,6 +32,7 @@ async def ask_user(
     as a separate callback event and be fed into the next agent run.
     """
     tc = ctx.context
+    tc.suppress_final_text = True
     await tc.status_msg.edit_text(
         f"❓ {question}",
         reply_markup=ask_user_keyboard(options, allow_skip),

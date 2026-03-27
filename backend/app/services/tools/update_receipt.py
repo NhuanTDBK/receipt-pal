@@ -88,6 +88,7 @@ async def update_receipt(
     Only include items that need updating. Re-displays the updated card.
     """
     tc = ctx.context
+    tc.suppress_final_text = True
     data = await tc.state.get_data()
     draft = data.get("draft")
 

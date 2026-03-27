@@ -175,10 +175,10 @@ async def run_agent(
                 )
                 await db_session.commit()
 
-        # If the agent produced text output (not just tool calls), send it
+        # If tools already updated UI (draft card / ask-user prompt), skip redundant text.
         if result.final_output and isinstance(result.final_output, str):
             text = result.final_output.strip()
-            if text:
+            if text and not context.suppress_final_text:
                 await message.answer(text)
 
     except Exception as exc:

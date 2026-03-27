@@ -5,6 +5,20 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+
+## [v2.1.3] — 2026-03-27
+
+### Changed
+- **Analytics date-handling guidance** — updated `backend/app/prompts/analytics_instructions.md` to require multilingual time interpretation and normalization to concrete ISO `start_date`/`end_date` bounds before `search_receipts` calls.
+
+### Fixed
+- **Time-range analytics execution** — `run_query` sandbox now exposes `date`, `datetime`, and `timedelta`, enabling safe date-window queries (e.g., last week/this month) without blocked imports.
+- **Receipt search date filtering** — `search_receipts` now supports `start_date` and `end_date` filters and validates invalid ranges.
+- **Relative date support in search** — `search_receipts` now accepts relative English phrases (`today`, `last week`, `last N days`, etc.) as a fallback parser.
+- **Duplicate post-parse message** — removed redundant follow-up chat text after tool-driven UI updates (draft card / inline keyboard) by suppressing `final_output` when tools already edited the status message.
+
+---
+
 ## [v2.1.2] — 2026-03-21
 
 ### Fixed

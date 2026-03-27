@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import json
 import traceback
+from datetime import date, datetime, timedelta
 from typing import Annotated
 
 from agents import RunContextWrapper, function_tool
@@ -109,7 +110,8 @@ async def run_query(
         (
             "Python code using SQLAlchemy to query the user's receipts. "
             "Available names: session, select, func, and_, or_, desc, asc, "
-            "case, cast, Float, Integer, Receipt, ReceiptItem, user_id. "
+            "case, cast, Float, Integer, date, datetime, timedelta, "
+            "Receipt, ReceiptItem, user_id. "
             "Assign the final result to a variable named `result`. "
             "Example:\n"
             "  stmt = select(Receipt.category, func.sum(Receipt.total).label('total'))"
@@ -154,6 +156,9 @@ async def run_query(
             "cast": cast,
             "Float": Float,
             "Integer": Integer,
+            "date": date,
+            "datetime": datetime,
+            "timedelta": timedelta,
             "Receipt": Receipt,
             "ReceiptItem": ReceiptItem,
             "user_id": user_id,

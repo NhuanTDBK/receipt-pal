@@ -114,6 +114,7 @@ async def submit_receipt_draft(
     and displays the receipt card. The user will then confirm, edit, or cancel.
     """
     tc = ctx.context
+    tc.suppress_final_text = True
     raw = _assign_item_ids(receipt.model_dump())
     tc.draft = raw
 
