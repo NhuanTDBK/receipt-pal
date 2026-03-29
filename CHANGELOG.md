@@ -1,7 +1,27 @@
 # Changelog
 
-All notable changes to Receipt Pal are documented here.  
+All notable changes to Receipt Pal are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+
+---
+
+
+## [v2.1.4] — 2026-03-29
+
+### Added
+- **Comprehensive test suite** — backend now has a full test suite with unit, integration, and real-LLM tests
+- **Testing documentation** — detailed guide for running different test types (fast default, PostgreSQL-backed, real-LLM verification)
+- **Documentation index** — `docs/index.md` for better project navigation
+
+### Fixed
+- **Type checking in models** — added `TYPE_CHECKING` imports to resolve forward reference warnings in `conversation.py`, `receipt.py`, and `user.py`
+- **Timezone handling** — replaced `datetime.UTC` with `timezone.utc` for Python 3.12 compatibility
+- **ISO datetime parsing** — fixed parsing to properly handle 'Z' suffix in datetime strings
+
+### Changed
+- **PoC agent structure** — refactored agent and CLI implementations for better modularity
+- **Tool implementations** — improved error handling and cleaned up unused imports
+- **Project documentation** — updated README with testing guide and WISHLIST.md with feature roadmap
 
 ---
 
