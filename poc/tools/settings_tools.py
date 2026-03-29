@@ -8,7 +8,6 @@ Tool:
 from __future__ import annotations
 
 import json
-from datetime import datetime
 from typing import Literal
 
 from agents import function_tool, RunContextWrapper

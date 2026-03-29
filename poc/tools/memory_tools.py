@@ -20,11 +20,11 @@ from models import Memory
 from receipt_context import ReceiptParserContext
 
 _TIME_DELTAS: dict[str, timedelta | None] = {
-    "last_week":    timedelta(weeks=1),
-    "last_month":   timedelta(days=30),
+    "last_week": timedelta(weeks=1),
+    "last_month": timedelta(days=30),
     "last_3_months": timedelta(days=90),
-    "last_year":    timedelta(days=365),
-    "all":          None,
+    "last_year": timedelta(days=365),
+    "all": None,
 }
 
 
@@ -58,17 +58,22 @@ async def set_memory(
         session.commit()
         created_at = session.get(Memory, memory.id).created_at
 
-    return json.dumps({
-        "status": "saved",
-        "content": content,
-        "created_at": created_at.isoformat() if created_at else None,
-    }, ensure_ascii=False)
+    return json.dumps(
+        {
+            "status": "saved",
+            "content": content,
+            "created_at": created_at.isoformat() if created_at else None,
+        },
+        ensure_ascii=False,
+    )
 
 
 @function_tool
 async def get_memory(
     ctx: RunContextWrapper[ReceiptParserContext],
-    time_range: Literal["last_week", "last_month", "last_3_months", "last_year", "all"] = "last_month",
+    time_range: Literal[
+        "last_week", "last_month", "last_3_months", "last_year", "all"
+    ] = "last_month",
     queries: list[str] | None = None,
 ) -> str:
     """Retrieve stored notes for the current user.
@@ -97,11 +102,15 @@ async def get_memory(
             for keyword in queries:
                 conditions.append(Memory.content.ilike(f"%{keyword}%"))
 
-        rows = session.execute(
-            select(Memory)
-            .where(and_(*conditions))
-            .order_by(Memory.created_at.desc())
-        ).scalars().all()
+        rows = (
+            session.execute(
+                select(Memory)
+                .where(and_(*conditions))
+                .order_by(Memory.created_at.desc())
+            )
+            .scalars()
+            .all()
+        )
 
     results = [
         {

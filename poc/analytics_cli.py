@@ -28,9 +28,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 load_dotenv()
 
 from agents import Runner
-from agents.stream_events import RawResponsesStreamEvent, RunItemStreamEvent, AgentUpdatedStreamEvent
+from agents.stream_events import (
+    RawResponsesStreamEvent,
+    RunItemStreamEvent,
+)
 from agents.items import (
-    MessageOutputItem,
     ReasoningItem,
     ToolCallItem,
     ToolCallOutputItem,
@@ -43,13 +45,13 @@ from db import init_db
 _DEFAULT_USER_ID = "00000000-0000-0000-0000-000000000001"
 
 # ── ANSI colours ──────────────────────────────────────────────────────────────
-_GREY   = "\033[90m"
-_CYAN   = "\033[96m"
+_GREY = "\033[90m"
+_CYAN = "\033[96m"
 _YELLOW = "\033[93m"
-_GREEN  = "\033[92m"
-_RESET  = "\033[0m"
-_BOLD   = "\033[1m"
-_DIM    = "\033[2m"
+_GREEN = "\033[92m"
+_RESET = "\033[0m"
+_BOLD = "\033[1m"
+_DIM = "\033[2m"
 
 
 def _resolve_user_id() -> uuid.UUID:
@@ -118,13 +120,14 @@ async def _stream_turn(
     """
     thinking_shown = False
     text_started = False
-    pending_newline = False  # track whether we need to print a newline before new sections
+    pending_newline = (
+        False  # track whether we need to print a newline before new sections
+    )
 
     print(f"  {_DIM}💭 thinking…{_RESET}", end="", flush=True)
 
     stream = Runner.run_streamed(agent, history, context=ctx)
     async for event in stream.stream_events():
-
         # ── Reasoning / thinking tokens ──────────────────────────────────
         if isinstance(event, RunItemStreamEvent):
             item = event.item
@@ -144,7 +147,7 @@ async def _stream_turn(
             elif isinstance(item, ToolCallItem):
                 raw = item.raw_item
                 tool_name = getattr(raw, "name", "?")
-                raw_args  = getattr(raw, "arguments", "") or ""
+                raw_args = getattr(raw, "arguments", "") or ""
 
                 if not text_started:
                     # Clear the "thinking…" line
@@ -186,7 +189,9 @@ async def _stream_turn(
                     token = getattr(data, "delta", "") or ""
                     if token:
                         if not text_started:
-                            print(f"\r  {_GREEN}{_BOLD}Bot:{_RESET} ", end="", flush=True)
+                            print(
+                                f"\r  {_GREEN}{_BOLD}Bot:{_RESET} ", end="", flush=True
+                            )
                             text_started = True
                         print(token, end="", flush=True)
                         pending_newline = True

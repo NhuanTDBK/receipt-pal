@@ -110,5 +110,12 @@ def build_receipt_agent(settings) -> Agent[ReceiptParserContext]:
         name="Receipt-Pal Parser",
         instructions=instructions,
         model=_MODEL,
-        tools=[ask_user, submit_receipt_draft, submit_receipt_final, update_receipt, set_memory, update_settings],
+        tools=[
+            ask_user,
+            submit_receipt_draft,
+            submit_receipt_final,
+            update_receipt,
+            set_memory,
+            update_settings,
+        ],
     )

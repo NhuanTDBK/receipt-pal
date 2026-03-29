@@ -35,10 +35,12 @@ def _extract_entries(corpus: str) -> list[dict[str, str]]:
         re.DOTALL,
     )
     for match in pattern.finditer(corpus):
-        entries.append({
-            "question": match.group("question").strip(),
-            "answer": match.group("answer").strip(),
-        })
+        entries.append(
+            {
+                "question": match.group("question").strip(),
+                "answer": match.group("answer").strip(),
+            }
+        )
     return entries
 
 

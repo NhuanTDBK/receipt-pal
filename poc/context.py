@@ -8,7 +8,7 @@ The model never sees it as a tool parameter.
 from __future__ import annotations
 
 import uuid
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from sqlalchemy.orm import Session, sessionmaker
 

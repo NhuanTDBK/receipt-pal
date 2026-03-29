@@ -102,19 +102,21 @@ def _ingest_receipts(factory: sessionmaker[Session], user_id: uuid.UUID) -> int:
             session.flush()
 
             for item_data in data.get("items", []):
-                session.add(ReceiptItem(
-                    id=str(uuid.uuid4()),
-                    receipt_id=receipt.id,
-                    name=item_data.get("name", ""),
-                    name_raw=item_data.get("name_raw"),
-                    quantity=item_data.get("quantity", 1),
-                    unit_price=item_data.get("unit_price"),
-                    amount=item_data.get("amount", 0),
-                    confidence=item_data.get("confidence", "high"),
-                    toppings=item_data.get("toppings"),
-                    modifiers=item_data.get("modifiers"),
-                    food_tags=item_data.get("food_tags"),
-                ))
+                session.add(
+                    ReceiptItem(
+                        id=str(uuid.uuid4()),
+                        receipt_id=receipt.id,
+                        name=item_data.get("name", ""),
+                        name_raw=item_data.get("name_raw"),
+                        quantity=item_data.get("quantity", 1),
+                        unit_price=item_data.get("unit_price"),
+                        amount=item_data.get("amount", 0),
+                        confidence=item_data.get("confidence", "high"),
+                        toppings=item_data.get("toppings"),
+                        modifiers=item_data.get("modifiers"),
+                        food_tags=item_data.get("food_tags"),
+                    )
+                )
             inserted += 1
 
         session.commit()

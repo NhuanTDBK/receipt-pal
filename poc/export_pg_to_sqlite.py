@@ -35,7 +35,6 @@ import argparse
 import json
 import os
 import sys
-import uuid
 from pathlib import Path
 from typing import Any
 
@@ -60,11 +59,12 @@ _DEFAULT_POC_USER = "00000000-0000-0000-0000-000000000001"
 # PostgreSQL helpers
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 def _pg_url() -> str:
-    host    = os.environ.get("PG_HOST",   "127.0.0.1")
-    port    = os.environ.get("PG_PORT",   "5432")
-    user    = os.environ.get("PG_USER",   "postgres")
-    dbname  = os.environ.get("PG_DBNAME", "receipt_pal")
+    host = os.environ.get("PG_HOST", "127.0.0.1")
+    port = os.environ.get("PG_PORT", "5432")
+    user = os.environ.get("PG_USER", "postgres")
+    dbname = os.environ.get("PG_DBNAME", "receipt_pal")
     password = os.environ.get("PG_PASSWORD", "")
     if not password:
         print("ERROR: PG_PASSWORD env var is not set.")
@@ -77,7 +77,9 @@ def _fetch_user_ids(pg_session: Session, target_id: str | None) -> list[str]:
     """Return the list of Postgres user UUIDs to export."""
     if target_id:
         return [target_id]
-    rows = pg_session.execute(text("SELECT id FROM users ORDER BY created_at")).fetchall()
+    rows = pg_session.execute(
+        text("SELECT id FROM users ORDER BY created_at")
+    ).fetchall()
     return [str(r[0]) for r in rows]
 
 
@@ -133,6 +135,7 @@ def _fetch_items(pg_session: Session, receipt_id: str) -> list[dict[str, Any]]:
 # ─────────────────────────────────────────────────────────────────────────────
 # SQLite helpers
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 def _jsonb_to_py(value: Any) -> Any:
     """psycopg2 returns JSONB as Python objects already; normalise edge cases."""
@@ -201,19 +204,21 @@ def _upsert_items(
         if existing:
             continue
         if not dry_run:
-            sqlite_session.add(ReceiptItem(
-                id=item["id"],
-                receipt_id=item["receipt_id"],
-                name=item["name"],
-                name_raw=item.get("name_raw"),
-                quantity=item.get("quantity", 1),
-                unit_price=item.get("unit_price"),
-                amount=item.get("amount", 0),
-                confidence=item.get("confidence", "high"),
-                toppings=_jsonb_to_py(item.get("toppings")),
-                modifiers=_jsonb_to_py(item.get("modifiers")),
-                food_tags=_jsonb_to_py(item.get("food_tags")),
-            ))
+            sqlite_session.add(
+                ReceiptItem(
+                    id=item["id"],
+                    receipt_id=item["receipt_id"],
+                    name=item["name"],
+                    name_raw=item.get("name_raw"),
+                    quantity=item.get("quantity", 1),
+                    unit_price=item.get("unit_price"),
+                    amount=item.get("amount", 0),
+                    confidence=item.get("confidence", "high"),
+                    toppings=_jsonb_to_py(item.get("toppings")),
+                    modifiers=_jsonb_to_py(item.get("modifiers")),
+                    food_tags=_jsonb_to_py(item.get("food_tags")),
+                )
+            )
         inserted += 1
     return inserted
 
@@ -221,6 +226,7 @@ def _upsert_items(
 # ─────────────────────────────────────────────────────────────────────────────
 # Main export logic
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 def run_export(
     target_pg_user_id: str | None,
@@ -231,7 +237,7 @@ def run_export(
     poc_user_id = os.environ.get("POC_USER_ID", _DEFAULT_POC_USER)
 
     # ── Postgres connection ────────────────────────────────────────────────────
-    print(f"  Connecting to PostgreSQL …")
+    print("  Connecting to PostgreSQL …")
     pg_engine = create_engine(_pg_url(), echo=False)
     PgSession = sessionmaker(pg_engine, expire_on_commit=False)
 
@@ -249,7 +255,7 @@ def run_export(
         print()
 
         total_receipts = 0
-        total_items    = 0
+        total_items = 0
 
         for pg_uid in pg_user_ids:
             # Map every PG user → the same SQLite PoC user (single-user PoC),
@@ -264,7 +270,9 @@ def run_export(
                 inserted_i = 0
 
                 for pg_receipt in receipts:
-                    inserted = _upsert_receipt(sqlite_session, pg_receipt, sqlite_uid, dry_run)
+                    inserted = _upsert_receipt(
+                        sqlite_session, pg_receipt, sqlite_uid, dry_run
+                    )
                     if inserted:
                         inserted_r += 1
                         items = _fetch_items(pg_session, pg_receipt["id"])
@@ -280,18 +288,23 @@ def run_export(
                     + (f"  (skipped {skipped_r} already present)" if skipped_r else "")
                 )
                 total_receipts += inserted_r
-                total_items    += inserted_i
+                total_items += inserted_i
 
     print()
     if dry_run:
-        print(f"  DRY RUN complete — would insert {total_receipts} receipt(s) and {total_items} item(s).")
+        print(
+            f"  DRY RUN complete — would insert {total_receipts} receipt(s) and {total_items} item(s)."
+        )
     else:
-        print(f"  ✅ Export complete — {total_receipts} receipt(s), {total_items} item(s) written to {sqlite_path}")
+        print(
+            f"  ✅ Export complete — {total_receipts} receipt(s), {total_items} item(s) written to {sqlite_path}"
+        )
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # CLI entry point
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 def _parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(

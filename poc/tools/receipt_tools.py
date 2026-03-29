@@ -57,8 +57,14 @@ class ReceiptItem(BaseModel):
     modifiers: ItemModifiers | None = None
     food_tags: list[
         Literal[
-            "sugary", "fried", "healthy", "alcohol",
-            "caffeine", "dairy", "spicy", "non_food",
+            "sugary",
+            "fried",
+            "healthy",
+            "alcohol",
+            "caffeine",
+            "dairy",
+            "spicy",
+            "non_food",
         ]
     ] = []
 
@@ -76,10 +82,21 @@ class ReceiptData(BaseModel):
     tax_amount: int | None = None
     total: int | None = None
     currency: str = "VND"
-    category: Literal[
-        "dining", "cafe", "grocery", "convenience", "health",
-        "entertainment", "transport", "utilities", "rent", "other",
-    ] | None = None
+    category: (
+        Literal[
+            "dining",
+            "cafe",
+            "grocery",
+            "convenience",
+            "health",
+            "entertainment",
+            "transport",
+            "utilities",
+            "rent",
+            "other",
+        ]
+        | None
+    ) = None
     source: Literal[
         "paper", "shopeefood", "grabfood", "gofood", "baemin", "app_unknown"
     ] = "paper"
@@ -103,10 +120,21 @@ class ReceiptPatch(BaseModel):
 
     merchant: MerchantInfo | None = None
     datetime: str | None = None
-    category: Literal[
-        "dining", "cafe", "grocery", "convenience", "health",
-        "entertainment", "transport", "utilities", "rent", "other",
-    ] | None = None
+    category: (
+        Literal[
+            "dining",
+            "cafe",
+            "grocery",
+            "convenience",
+            "health",
+            "entertainment",
+            "transport",
+            "utilities",
+            "rent",
+            "other",
+        ]
+        | None
+    ) = None
     currency: str | None = None
     subtotal: int | None = None
     discount: int | None = None
@@ -226,7 +254,8 @@ async def ask_user(
     allow_skip: bool = True,
     field: Literal[
         "total", "date", "merchant", "category", "line_item", "edit_selection"
-    ] | None = None,
+    ]
+    | None = None,
 ) -> str:
     """Ask one clarification question and return the user's typed answer.
 

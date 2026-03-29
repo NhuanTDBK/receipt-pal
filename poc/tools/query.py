@@ -18,7 +18,6 @@ from typing import Annotated
 from agents import function_tool
 from agents.run_context import RunContextWrapper
 from sqlalchemy import select, func, and_, or_, desc, asc, case, cast, Float, Integer
-from sqlalchemy.orm import Session
 
 from context import ReceiptPalContext
 from models import Receipt, ReceiptItem
@@ -92,8 +91,9 @@ def _serialize(value) -> object:
     if hasattr(value, "_mapping"):
         return {k: _serialize(v) for k, v in value._mapping.items()}
     if hasattr(value, "__dict__"):
-        return {k: _serialize(v) for k, v in vars(value).items()
-                if not k.startswith("_")}
+        return {
+            k: _serialize(v) for k, v in vars(value).items() if not k.startswith("_")
+        }
     return str(value)
 
 
@@ -127,10 +127,12 @@ def run_query(
     # Guard against write operations before executing anything.
     offending = _check_for_write_ops(query_code)
     if offending:
-        return json.dumps({
-            "error": f"Disallowed operation detected: '{offending}'. "
-                     "Only read-only SELECT patterns are permitted."
-        })
+        return json.dumps(
+            {
+                "error": f"Disallowed operation detected: '{offending}'. "
+                "Only read-only SELECT patterns are permitted."
+            }
+        )
 
     user_id = str(ctx.context.user_id)
 

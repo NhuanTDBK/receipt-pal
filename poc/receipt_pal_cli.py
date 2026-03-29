@@ -118,7 +118,6 @@ async def _stream_turn(
 
     stream = Runner.run_streamed(agent, history, context=ctx)
     async for event in stream.stream_events():
-
         if isinstance(event, RunItemStreamEvent):
             item = event.item
 
