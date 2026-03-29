@@ -93,6 +93,6 @@ def _parse_datetime(value: str | None):
     from datetime import datetime
 
     try:
-        return datetime.fromisoformat(value)
+        return datetime.fromisoformat(value.replace("Z", "+00:00"))
     except (ValueError, TypeError):
         return None

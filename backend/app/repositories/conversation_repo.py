@@ -1,5 +1,5 @@
 import uuid
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from sqlalchemy import func, select, update as sa_update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -25,11 +25,11 @@ async def get_active_conversation(
     conversation = result.scalar_one_or_none()
 
     timeout = timedelta(minutes=settings.conversation_timeout_minutes)
-    now = datetime.now(UTC)
+    now = datetime.now(timezone.utc)
 
     if (
         conversation is None
-        or (now - conversation.last_message_at.replace(tzinfo=UTC)) > timeout
+        or (now - conversation.last_message_at.replace(tzinfo=timezone.utc)) > timeout
     ):
         if conversation is not None:
             conversation.is_active = False
@@ -77,7 +77,7 @@ async def append_message(
     )
     conversation = result.scalar_one_or_none()
     if conversation:
-        conversation.last_message_at = datetime.now(UTC)
+        conversation.last_message_at = datetime.now(timezone.utc)
 
     await session.flush()
     return msg
