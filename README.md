@@ -122,6 +122,57 @@ $(terraform output -raw ssh_command) 'cd /opt/receipt-pal && docker compose rest
 
 ---
 
+## ✅ Testing
+
+The backend test suite now lives under `backend/tests/` and is split into three layers:
+
+- deterministic unit and smoke tests for doubles, handlers, generators, and runner wiring
+- PostgreSQL-backed integration tests for search, analytics, and persistence helpers
+- opt-in real-LLM verification tests that stay skipped unless explicitly enabled
+
+Sample receipt fixtures are reused from `data/receipts/*.json`, and synthetic receipts are generated from `backend/tests/generators/`.
+
+### Fast default run
+
+Run the backend suite with skips for anything that needs extra services or real API access:
+
+```bash
+cd backend
+pytest -q
+```
+
+This runs the deterministic tests immediately. Database-backed tests are skipped if the test database is unavailable. Real-LLM tests are always skipped unless opted in.
+
+### PostgreSQL-backed integration tests
+
+Point tests at a dedicated PostgreSQL database before running DB-backed coverage:
+
+```bash
+cd backend
+export TEST_DATABASE_URL='postgresql+asyncpg://receipt_pal:receipt_pal@localhost:5432/receipt_pal_test'
+pytest -q -m database
+```
+
+The suite creates missing tables automatically and truncates mapped tables between tests. Do not point `TEST_DATABASE_URL` at a non-test database.
+
+### Opt-in real LLM verification
+
+Real-model verification is intentionally off by default. Enable it only when you want to validate behavior against the live provider:
+
+```bash
+cd backend
+export TEST_DATABASE_URL='postgresql+asyncpg://receipt_pal:receipt_pal@localhost:5432/receipt_pal_test'
+export RUN_REAL_LLM_TESTS=1
+export GEMINI_API_KEY='<real-key>'
+pytest -q -m real_llm
+```
+
+Notes:
+
+- If you use `GEMINI_API_KEY`, the test harness maps it through the OpenAI-compatible settings used by the app.
+- Real-LLM tests are behavior-based, not exact-text snapshots. They check stable outcomes like parsed totals, merchant mentions, and category coverage.
+- Expect these tests to be slower and potentially more variable than the deterministic suite.
+
 ## 📝 Versioning & Releases
 
 Releases are tagged as `v<major>.<minor>.<patch>` on `main` branch.

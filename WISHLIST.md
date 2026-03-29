@@ -1,26 +1,28 @@
-1. onboarding - setting (skip anytime)
-
-- ask language
-- response preference
-- location
-
-2. update receipt by id
-3. mapping address to store entity with geolocation and icon
-4. auto scanning hobby schedule => schedule and hook
-5. free style analytics: poc mode sqlinjection x
-6. augment store info
-7. store advise promotion sending
-8. store alternative
-9. zalo bot
-10. check dup
-11. pdf import x
-12. setup logging monitoring uptime
-13. review edit flow - wrong update item id
-14. family/group
-15. localization: vie và eng
-16. free form input
-17. voice input => for offline market
-18. persona config, memory creation
-19. add holiday event
-20. add public event news
-21. add memory day, week, month, year synthesization
+- [x] 1. onboarding - setting (skip anytime)
+  - [x] ask language
+  - [x] response preference
+  - [x] location
+- [ ] 2. update receipt by id
+- [ ] 3. mapping address to store entity with geolocation and icon
+- [ ] 4. auto scanning hobby schedule => schedule and hook
+- [x] 5. free style analytics: poc mode sqlinjection
+- [ ] 6. augment store info
+- [ ] 7. store advise promotion sending
+- [ ] 8. store alternative
+- [ ] 9. zalo bot
+- [ ] 10. check dup
+- [x] 11. pdf import
+- [ ] 12. setup logging monitoring uptime
+- [ ] 13. review edit flow - wrong update item id
+- [ ] 14. family/group
+- [ ] 15. localization: vie và eng
+- [x] 16. free form input
+- [ ] 17. voice input => for offline market
+- [ ] 18. persona config, memory creation
+- [ ] 19. add holiday event
+- [ ] 20. add public event news
+- [ ] 21. add memory day, week, month, year synthesization
+- [ ] 22. following-up actions	
+- [ ] 23. Airflow scheduler for time-based actions
+- [ ] 24. Separate bot and telegram/zalo handlers for better modularity
+- [ ] 25. Add more test cases for edge scenarios and error handling, add telegram mock bot for testing
