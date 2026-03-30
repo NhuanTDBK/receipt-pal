@@ -68,7 +68,7 @@ async def list_receipts(
         select(Receipt)
         .where(Receipt.user_id == user_id)
         .options(selectinload(Receipt.items))
-        .order_by(Receipt.created_at.desc())
+        .order_by(Receipt.receipt_datetime.desc())
         .limit(limit)
     )
     return list(result.scalars().all())
