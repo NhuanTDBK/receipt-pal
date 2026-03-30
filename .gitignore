@@ -144,6 +144,10 @@ ENV/
 env.bak/
 venv.bak/
 
+# Terraform secrets
+*.tfvars
+!terraform.tfvars.example
+
 # PoC SQLite snapshot (contains real user data — never commit)
 poc/poc_receipts.db
 
