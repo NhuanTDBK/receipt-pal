@@ -6,6 +6,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ---
 
 
+## [v2.1.6] — 2026-03-30
+
+### Fixed
+- **Receipt time ordering** — `list_receipts()` now orders by `receipt_datetime` instead of `created_at`, ensuring analytic queries and search use actual receipt purchase time as the default time column
+
+---
+
 ## [v2.1.5] — 2026-03-30
 
 ### Changed
