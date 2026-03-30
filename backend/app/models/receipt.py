@@ -2,8 +2,8 @@ import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, ForeignKey, Integer, Numeric, String, Text, func
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy import DateTime, ForeignKey, Integer, JSON, Numeric, String, Text, func
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -84,8 +84,8 @@ class ReceiptItem(Base):
     amount: Mapped[int] = mapped_column(Integer, nullable=False)
     confidence: Mapped[str] = mapped_column(String(20), nullable=False, default="high")
 
-    toppings: Mapped[list | None] = mapped_column(JSONB, nullable=True)
-    modifiers: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
-    food_tags: Mapped[list | None] = mapped_column(JSONB, nullable=True)
+    toppings: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    modifiers: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    food_tags: Mapped[list | None] = mapped_column(JSON, nullable=True)
 
     receipt: Mapped["Receipt"] = relationship(back_populates="items")

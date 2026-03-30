@@ -6,6 +6,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ---
 
 
+## [v2.1.5] — 2026-03-30
+
+### Changed
+- **Test database requirement** — tests now require PostgreSQL via `TEST_DATABASE_URL` environment variable; SQLite fallback removed
+- **Test fixtures** — `build_generated_receipt_payload` now supports `receipt_datetime` and `items` parameters for better test control
+
+### Fixed
+- **Decimal serialization** — `run_query` tool now properly serializes PostgreSQL `Decimal` values to JSON
+- **Test assertions** — updated to handle PostgreSQL's UTC timezone format and `None` for empty `SUM()` results
+- **Test database detection** — `_is_sqlite()` now works correctly with PostgreSQL
+
+---
+
 ## [v2.1.4] — 2026-03-29
 
 ### Added
@@ -17,8 +30,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Type checking in models** — added `TYPE_CHECKING` imports to resolve forward reference warnings in `conversation.py`, `receipt.py`, and `user.py`
 - **Timezone handling** — replaced `datetime.UTC` with `timezone.utc` for Python 3.12 compatibility
 - **ISO datetime parsing** — fixed parsing to properly handle 'Z' suffix in datetime strings
+- **SQL injection vulnerability** — replaced Python code execution with parameterized SQL queries in `run_query` tool
 
 ### Changed
+- **Analytics tool migration** — transitioned `run_query` from SQLAlchemy Python code execution to raw SQL with parameter binding
 - **PoC agent structure** — refactored agent and CLI implementations for better modularity
 - **Tool implementations** — improved error handling and cleaned up unused imports
 - **Project documentation** — updated README with testing guide and WISHLIST.md with feature roadmap

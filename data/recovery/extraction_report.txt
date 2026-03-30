@@ -1,0 +1,33 @@
+Receipt Data Extraction Report
+==================================================
+Backup file: /Users/nhuantran/Downloads/history backup_datasets_jkzJaZR63ZKOsQ-GtZj5Dw_2026-03-29T16_21_36.269Z.jsonl
+Extraction date: 2026-03-30T16:55:44.778039
+
+Summary:
+  - Total conversation turns: 159
+  - Receipt parsing requests: 76
+  - Successfully extracted: 10
+  - Failed extractions: 66
+
+Merchants found:
+  - Lạc - Lost and Chill: 1 receipt(s)
+  - Phê La: 1 receipt(s)
+  - Phở Thìn Lotte: 1 receipt(s)
+  - ShopeeFood tại Bonchon Chicken - Trung Hòa: 1 receipt(s)
+  - Smores Saigon Caffè cho bạn: 1 receipt(s)
+  - Su Trà: 1 receipt(s)
+  - quán HUB: 1 receipt(s)
+  - the receipt: 1 receipt(s)
+  - tròn chạm: 1 receipt(s)
+
+Failed extractions:
+  - Turn n6HIaeWZCIyb1e8PhrvV...
+  - Turn uq3Habm9JamVvr0PvK2I...
+  - Turn ISHGadrTG7myvr0P_N_a...
+  - Turn HyHGacKSHNKJ1e8P89Px...
+  - Turn HCHGaeC7EdzV1e8P-Kr0...
+  - Turn GiHGaYDwAbft1e8P9Kec...
+  - Turn FyHGadW_HO-hvr0PqKGv...
+  - Turn EyHGaZmVNMWd1e8P2qWc...
+  - Turn ESHGaZu-GeGovr0PyYrK...
+  - Turn DyHGaZTPHqmVvr0PncGD...

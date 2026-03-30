@@ -6,11 +6,24 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 from app.database import Base
 
 
-def _truncate_statement() -> str | None:
-    table_names = [f'"{table.name}"' for table in reversed(Base.metadata.sorted_tables)]
+def _is_sqlite(engine: AsyncEngine) -> bool:
+    """Check if the engine is using SQLite."""
+    return "sqlite" in str(engine.url).lower()
+
+
+def _truncate_statement(engine: AsyncEngine) -> list[str]:
+    """Generate statements to clear all tables."""
+    table_names = [table.name for table in reversed(Base.metadata.sorted_tables)]
     if not table_names:
-        return None
-    return f"TRUNCATE {', '.join(table_names)} RESTART IDENTITY CASCADE"
+        return []
+
+    if _is_sqlite(engine):
+        # SQLite doesn't support TRUNCATE, use DELETE FROM
+        return [f"DELETE FROM {name}" for name in table_names]
+    else:
+        # PostgreSQL
+        quoted_names = [f'"{name}"' for name in table_names]
+        return [f"TRUNCATE {', '.join(quoted_names)} RESTART IDENTITY CASCADE"]
 
 
 async def prepare_database(engine: AsyncEngine) -> None:
@@ -22,9 +35,10 @@ async def prepare_database(engine: AsyncEngine) -> None:
 
 async def reset_database(engine: AsyncEngine) -> None:
     """Clear all mapped tables between tests."""
-    statement = _truncate_statement()
-    if not statement:
+    statements = _truncate_statement(engine)
+    if not statements:
         return
 
     async with engine.begin() as conn:
-        await conn.execute(text(statement))
+        for stmt in statements:
+            await conn.execute(text(stmt))

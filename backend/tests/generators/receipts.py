@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import copy
 import json
-from datetime import timedelta
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Sequence
 
@@ -212,6 +212,8 @@ def build_generated_receipt_payload(
     days_ago: int = 0,
     merchant_name: str | None = None,
     total: int | None = None,
+    receipt_datetime: str | None = None,
+    items: list[dict[str, Any]] | None = None,
     **overrides: Any,
 ) -> dict[str, Any]:
     if category not in _CATEGORY_TEMPLATES:
@@ -227,12 +229,21 @@ def build_generated_receipt_payload(
     if merchant_name is not None:
         merchant["name"] = merchant_name
 
-    computed_total = total or sum(item["amount"] for item in template["items"])
-    timestamp = DEFAULT_RECEIPT_DATETIME - timedelta(days=days_ago + index)
+    # Use provided items or template items
+    payload_items = items if items is not None else template["items"]
+    computed_total = total or sum(item["amount"] for item in payload_items)
+    # Use provided receipt_datetime or calculate from days_ago
+    if receipt_datetime is not None:
+        dt = datetime.fromisoformat(receipt_datetime.replace("Z", "+00:00"))
+    else:
+        dt = DEFAULT_RECEIPT_DATETIME - timedelta(days=days_ago + index)
+    timestamp = dt.isoformat()
+    # Remove items from overrides to avoid duplicate keyword argument
+    overrides.pop("items", None)
     payload = build_receipt_payload(
         merchant=merchant,
-        datetime=timestamp.isoformat(),
-        items=template["items"],
+        datetime=timestamp,
+        items=payload_items,
         subtotal=computed_total,
         total=computed_total,
         category=category,
@@ -241,7 +252,7 @@ def build_generated_receipt_payload(
     )
 
     if category == "utilities":
-        payload["billing_period"] = timestamp.strftime("%Y-%m")
+        payload["billing_period"] = dt.strftime("%Y-%m")
 
     return normalize_receipt_payload(payload)
 

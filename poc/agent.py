@@ -21,6 +21,7 @@ from agents import Agent, set_default_openai_api, set_tracing_disabled
 
 from context import ReceiptPalContext
 from receipt_context import ReceiptParserContext
+from schema_generator import build_analytics_prompt
 from tools import search_receipts, run_query, answer_faq
 from tools.receipt_tools import (
     ask_user,
@@ -87,10 +88,11 @@ def configure_provider() -> None:
 
 
 def build_agent() -> Agent[ReceiptPalContext]:
-    """Return the fully-configured analytics agent."""
+    """Return the fully-configured analytics agent with dynamic schema."""
+    instructions = build_analytics_prompt(str(_ANALYTICS_PROMPT_PATH))
     return Agent[ReceiptPalContext](
         name="Receipt-Pal Analytics",
-        instructions=_ANALYTICS_PROMPT_PATH.read_text(encoding="utf-8"),
+        instructions=instructions,
         model=_MODEL,
         tools=[search_receipts, run_query, answer_faq],
     )

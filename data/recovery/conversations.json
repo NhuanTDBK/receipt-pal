@@ -1,0 +1,959 @@
+{
+  "total_conversations": 159,
+  "conversations": [
+    {
+      "turn_id": "RfTIabbqNujy2roPv_OvKA",
+      "create_time": "2026-03-29T09:43:36.675651Z",
+      "user_message": "tổng hợp hóa đơn trong 1 tuần vừa qua",
+      "assistant_response": "Tôi thực sự xin lỗi vì sự bất tiện này. Hệ thống đang gặp lỗi kỹ thuật khi cố gắng truy xuất danh sách hóa đơn chi tiết cho bạn.\n\nĐể tôi giúp bạn theo "
+    },
+    {
+      "turn_id": "Q_TIaf3rIY230-kPw7PWkQ8",
+      "create_time": "2026-03-29T09:43:34.615560Z",
+      "user_message": "tổng hợp hóa đơn trong 1 tuần vừa qua",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "W_PIaYHOCs2Y0-kPzsbpiAc",
+      "create_time": "2026-03-29T09:39:41.277394Z",
+      "user_message": "tổng hợp hóa đơn trong 1 tuần vừa qua",
+      "assistant_response": "Xin lỗi bạn, có vẻ như hệ thống đang gặp lỗi nhỏ khi truy xuất danh sách hóa đơn. Để khắc phục, tôi sẽ thử tìm kiếm cụ thể các hóa đơn gần ngày 29 th"
+    },
+    {
+      "turn_id": "WfPIaeL8BrOZ0-kPitC22Qk",
+      "create_time": "2026-03-29T09:39:39.770721Z",
+      "user_message": "tổng hợp hóa đơn trong 1 tuần vừa qua",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "L_PIaZzlBZrs1e8P_f-BwAU",
+      "create_time": "2026-03-29T09:38:57.034145Z",
+      "user_message": "tổng hợp hóa đơn trong 1 tuần vừa qua",
+      "assistant_response": "Rất xin lỗi bạn vì sự nhầm lẫn này. Có thể do bộ lọc thời gian trong truy vấn của tôi bị giới hạn trong 7 ngày gần nhất nên các hóa đơn từ ngày 29 tháng"
+    },
+    {
+      "turn_id": "LfPIaeSxEYf31e8P94eE6Q4",
+      "create_time": "2026-03-29T09:38:55.278156Z",
+      "user_message": "tổng hợp hóa đơn trong 1 tuần vừa qua",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "a-_Iaa7lKNb_1e8Ph_qToAs",
+      "create_time": "2026-03-29T09:22:54.358619Z",
+      "user_message": "tổng hợp hóa đơn trong 1 tuần vừa qua",
+      "assistant_response": "Dưới đây là chi tiết 4 hóa đơn của bạn trong 7 ngày qua:\n\n*   **15/03/2025** - Siêu thị WinMart: 1.250.000đ (Grocery)\n*   **14/03/2025** - Highland Coffee: 84.000đ (Cafe)\n*   **12"
+    },
+    {
+      "turn_id": "ae_Iad34HaSlvr0PsoCt6Qk",
+      "create_time": "2026-03-29T09:22:52.212504Z",
+      "user_message": "tổng hợp hóa đơn trong 1 tuần vừa qua",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "Z-_IaYCgLf-xvr0PxtqjkAE",
+      "create_time": "2026-03-29T09:22:50.037377Z",
+      "user_message": "tổng hợp hóa đơn trong 1 tuần vừa qua",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "Ze_IadGEMtKPosUPgJ_7mAE",
+      "create_time": "2026-03-29T09:22:48.268265Z",
+      "user_message": "tổng hợp hóa đơn trong 1 tuần vừa qua",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "Wu_IaZTKEZmT1e8Pg-mGyQg",
+      "create_time": "2026-03-29T09:22:36.220391Z",
+      "user_message": "tổng hợp hóa đơn trong 1 tuần vừa qua",
+      "assistant_response": "Trong tuần vừa qua, bạn đã chi tiêu tổng cộng **5.234.000đ** cho **4** hóa đơn."
+    },
+    {
+      "turn_id": "WO_Iace9McWd1e8P3u25uAk",
+      "create_time": "2026-03-29T09:22:35.647277Z",
+      "user_message": "tổng hợp hóa đơn trong 1 tuần vừa qua",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "V-_IaeGgB8fT1e8PytuXiQY",
+      "create_time": "2026-03-29T09:22:33.784307Z",
+      "user_message": "tổng hợp hóa đơn trong 1 tuần vừa qua",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "o6HIaYTVOuLu1e8Pup2mqQw",
+      "create_time": "2026-03-29T03:51:02.701613Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": "OK, tôi đã phân tích hóa đơn từ Phở Thìn Lotte. Mời bạn kiểm tra lại thông tin và xác nhận nhé."
+    },
+    {
+      "turn_id": "n6HIaeWZCIyb1e8PhrvVsQY",
+      "create_time": "2026-03-29T03:50:57.588283Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "va3HafjWDpmT1e8P8OPlwA8",
+      "create_time": "2026-03-28T10:30:24.223396Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": "Tiếp nhận hóa đơn từ Lạc - \"Lost and Chill\". Tổng tiền: 1.120.000đ.\n\nVui lòng kiểm tra lại thông tin trên thẻ hóa đơn và xác nhận nếu đã chính xác."
+    },
+    {
+      "turn_id": "uq3Habm9JamVvr0PvK2I6AY",
+      "create_time": "2026-03-28T10:30:21.381436Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "IyHGaffzJrvDvr0Po-Xq0Ao",
+      "create_time": "2026-03-27T06:18:13.800327Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": "Dưới đây là thống kê chi tiêu của bạn dựa trên 5 giao dịch gần nhất:\n\n*   **Dining (Ăn uống):** Có 2 giao dịch với tổng chi tiêu là 1.631.000đ.\n*   **Cafe:** Có 3 "
+    },
+    {
+      "turn_id": "ISHGadrTG7myvr0P_N_amAM",
+      "create_time": "2026-03-27T06:18:11.844451Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "HyHGacKSHNKJ1e8P89Px0Qo",
+      "create_time": "2026-03-27T06:18:09.840922Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "HCHGaeC7EdzV1e8P-Kr06QQ",
+      "create_time": "2026-03-27T06:18:06.874864Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "GiHGaYDwAbft1e8P9Kec0Q4",
+      "create_time": "2026-03-27T06:18:04.622126Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "FyHGadW_HO-hvr0PqKGvkAw",
+      "create_time": "2026-03-27T06:18:01.735148Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "EyHGaZmVNMWd1e8P2qWc2QY",
+      "create_time": "2026-03-27T06:17:58.134564Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "ESHGaZu-GeGovr0PyYrKyQw",
+      "create_time": "2026-03-27T06:17:55.847996Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "DyHGaZTPHqmVvr0PncGDuQE",
+      "create_time": "2026-03-27T06:17:53.965623Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "8CDGaafVMLOb1e8Pkp_12Ao",
+      "create_time": "2026-03-27T06:17:23.042217Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": "Tôi đã cập nhật tên quán thành Phê La. Bạn kiểm tra lại thông tin nhé."
+    },
+    {
+      "turn_id": "7iDGaYTyA7Ki1e8P2fC1qAg",
+      "create_time": "2026-03-27T06:17:20.383989Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "6iDGacn1PIGj1e8PgL65mAg",
+      "create_time": "2026-03-27T06:17:17.563963Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "CyDGadObAa2-1e8Pr6PI6Qc",
+      "create_time": "2026-03-27T06:13:33.236963Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": "OK. Tôi đã ghi nhận hóa đơn từ quán HUB. Bạn vui lòng xác nhận thông tin nhé."
+    },
+    {
+      "turn_id": "CSDGabGUC4f31e8P94eE6Q4",
+      "create_time": "2026-03-27T06:13:31.889150Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "7hHGadXMIdGX0-kPgfXU2Ag",
+      "create_time": "2026-03-27T05:13:21.143335Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": "Cảm ơn bạn. Tôi đã trích xuất thông tin từ biên nhận của Điện Máy Xanh:\n\n**Chi tiết:**\n- **Đơn vị:** Điện máy Xanh (139 Cầu Giấy)\n- **Ngày:** 26/03/2026\n- **Mặt"
+    },
+    {
+      "turn_id": "6xHGaYqkIKCw0-kPoNS-oAY",
+      "create_time": "2026-03-27T05:13:18.432350Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "SvfDaaD4M87C0-kPydPLwQw",
+      "create_time": "2026-03-25T14:55:09.421211Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": "OK. Tôi đã nhận được hóa đơn từ **tròn chạm**. Bạn vui lòng kiểm tra lại thông tin và xác nhận giúp tôi nhé."
+    },
+    {
+      "turn_id": "SPfDaZ6EEtDR2roP3oSWwAE",
+      "create_time": "2026-03-25T14:55:06.628658Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "U4fDaYeeK6C2vr0PqfOn4A8",
+      "create_time": "2026-03-25T06:57:26.248100Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": "OK. Tôi đã phân tích hóa đơn từ S'mores Saigon Caffè cho bạn. Bạn vui lòng xem lại các thông tin trên thẻ hóa đơn và xác nhận nhé."
+    },
+    {
+      "turn_id": "UIfDaez_At-WosUPi8Om4AE",
+      "create_time": "2026-03-25T06:57:22.326126Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "I23CaY_vEZmx0-kP5p6MuA8",
+      "create_time": "2026-03-24T10:53:26.192931Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": "OK. Đã nhận đơn hàng của bạn tại Starbucks Duy Tân. Vui lòng xác nhận thông tin trên hóa đơn."
+    },
+    {
+      "turn_id": "IG3CaZagK9bu2roP18C2gQQ",
+      "create_time": "2026-03-24T10:53:23.193991Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "LzbCaczTKr-kvr0P7crWsA8",
+      "create_time": "2026-03-24T06:58:58.377053Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": "OK, tôi đã nhận diện được hóa đơn từ GS 25 vào ngày 24/03/2026. Bạn vui lòng xác nhận hoặc chỉnh sửa thông tin nhé."
+    },
+    {
+      "turn_id": "LDbCaefZCY3o1e8Pw67fyQY",
+      "create_time": "2026-03-24T06:58:54.290573Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "dxTAaYzKC7mavr0Pp9iQ8Ak",
+      "create_time": "2026-03-22T16:10:32.876631Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": "OK, tôi đã phân tích hóa đơn từ ShopeeFood tại \"Bonchon Chicken - Trung Hòa\". Bạn vui lòng kiểm tra lại thông tin chi tiết trong thẻ hóa đơn và xác nhận nhé."
+    },
+    {
+      "turn_id": "cxTAabSgM-bBvr0P1q_e-Q0",
+      "create_time": "2026-03-22T16:10:30.609617Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "dd2_aZHCJbTp2roPkv3h2AE",
+      "create_time": "2026-03-22T12:15:52.053863Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": "OK. I've noted that the total is missing from the receipt. Please let me know the total amount when you have it, and I'll proceed with saving the receipt."
+    },
+    {
+      "turn_id": "c92_aaKdCZqp2roPrZnRuQ8",
+      "create_time": "2026-03-22T12:15:49.822614Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "68a-aeDMFZ3Yvr0Pwaa3eA",
+      "create_time": "2026-03-21T16:27:26.225506Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": "Đã lưu hóa đơn của bạn từ Su Trà."
+    },
+    {
+      "turn_id": "6ca-aa-rBbebvr0PocuIqAE",
+      "create_time": "2026-03-21T16:27:23.906235Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "5sa-acapHtLGvr0P9r6P0AU",
+      "create_time": "2026-03-21T16:27:20.965664Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "U8C-abDOF7aG1e8P1Z2E8Ao",
+      "create_time": "2026-03-21T15:59:17.381043Z",
+      "user_message": "What do you see in this image?",
+      "assistant_response": "A blank white image."
+    },
+    {
+      "turn_id": "kZ29abmGEYuk1e8PiqDCkQo",
+      "create_time": "2026-03-20T19:18:44.326908Z",
+      "user_message": "phân tích gu cà phê",
+      "assistant_response": "Dựa trên lịch sử các món bạn đã gọi tại quán cà phê, gu của bạn khá đa dạng và thiên về khám phá các trải nghiệm mới lạ. Dưới đây là phân tích chi ti"
+    },
+    {
+      "turn_id": "jJ29acnIPJi7vr0Pi72-gQM",
+      "create_time": "2026-03-20T19:18:39.555523Z",
+      "user_message": "phân tích gu cà phê",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "q5u9ac23EoPgvr0P5vDnoQ0",
+      "create_time": "2026-03-20T19:10:37.939717Z",
+      "user_message": "phân tích gu cà phê",
+      "assistant_response": "Để phân tích gu cà phê của bạn, tôi cần dữ liệu từ các hóa đơn bạn đã ghi nhận trong hệ thống. Hiện tại, dữ liệu của bạn đang trống.\n\nHãy gửi ảnh "
+    },
+    {
+      "turn_id": "tZq9acT4KY7k2roP3d72mAI",
+      "create_time": "2026-03-20T19:06:32.333197Z",
+      "user_message": "phân tích gu cà phê",
+      "assistant_response": "Chào bạn, tôi là **Receipt Pal**, trợ lý quản lý chi tiêu thông minh của bạn. Dưới đây là các câu hỏi thường gặp về cách hoạt động của tôi:\n\n### 1. Cách tô"
+    },
+    {
+      "turn_id": "45m9acaWCNrnosUPw6eayQc",
+      "create_time": "2026-03-20T19:03:01.622589Z",
+      "user_message": "phân tích gu cà phê",
+      "assistant_response": "Để phân tích gu cà phê của bạn, tôi cần xem lịch sử chi tiêu từ các hóa đơn bạn đã lưu. Tuy nhiên, hiện tại tôi chưa thấy dữ liệu hóa đơn nào trong hệ "
+    },
+    {
+      "turn_id": "g5C9adHUCKTG2roPsdLVwQE",
+      "create_time": "2026-03-20T18:23:02.276835Z",
+      "user_message": "change to tiếng Việt",
+      "assistant_response": "Rất xin lỗi bạn, hiện tại tôi chưa tìm thấy dữ liệu hóa đơn nào trong lịch sử của bạn để phân tích.\n\nBạn có thể tải lên các hóa đơn cũ hoặc chụp   "
+    },
+    {
+      "turn_id": "gZC9ac-cH-Gw0-kPvYG7gQ4",
+      "create_time": "2026-03-20T18:23:00.289846Z",
+      "user_message": "change to tiếng Việt",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "bZC9adqxN7Ha1e8PgePOgQw",
+      "create_time": "2026-03-20T18:22:40.750310Z",
+      "user_message": "change to tiếng Việt",
+      "assistant_response": "Để tôi có thể phân tích gu cà phê của bạn, bạn hãy gửi các hóa đơn mua đồ uống/cà phê trước đây.\n\nDựa trên dữ liệu từ các hóa đơn đó, tôi sẽ giúp"
+    },
+    {
+      "turn_id": "NJC9aZTzE7Kl0-kPovex6A0",
+      "create_time": "2026-03-20T18:21:43.140228Z",
+      "user_message": "change to tiếng Việt",
+      "assistant_response": "Cảm ơn bạn! Rất vui được hỗ trợ bạn. Bạn có hóa đơn nào cần lưu lại không? Hãy gửi ảnh hoặc file PDF nhé!"
+    },
+    {
+      "turn_id": "LJC9aYCzAv7Zvr0PwfCawAQ",
+      "create_time": "2026-03-20T18:21:34.856099Z",
+      "user_message": "change to tiếng Việt",
+      "assistant_response": "Đã cập nhật cài đặt thành công. Tôi sẽ giao tiếp với bạn bằng tiếng Việt kể từ phiên làm việc tiếp theo. Bạn có thể gửi hóa đơn để tôi bắt đầu n"
+    },
+    {
+      "turn_id": "KpC9adGuJvaa1e8P17by6Qk",
+      "create_time": "2026-03-20T18:21:33.202221Z",
+      "user_message": "change to tiếng Việt",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "bIK9afbDHpLv2roP88XWyA0",
+      "create_time": "2026-03-20T17:22:55.366312Z",
+      "user_message": "thêm món ốc ở hàng lược 100k",
+      "assistant_response": "I'm sorry you feel that way. I'm here to help you manage your receipts and expenses. If there's something specific you're unhappy with or if there's anything I can do to better assist you, please let "
+    },
+    {
+      "turn_id": "ZYK9abaoFJj-2roPqvCt0Q0",
+      "create_time": "2026-03-20T17:22:48.185892Z",
+      "user_message": "thêm món ốc ở hàng lược 100k",
+      "assistant_response": "Got it! I've updated your preference to English. From the next time we chat, I'll be responding to you in English. Is there anything else I can help you with today?"
+    },
+    {
+      "turn_id": "ZIK9abuPDa6r0-kPqZeQuA0",
+      "create_time": "2026-03-20T17:22:46.769221Z",
+      "user_message": "thêm món ốc ở hàng lược 100k",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "XYK9af67K4XZ2roPx97C2Qs",
+      "create_time": "2026-03-20T17:22:40.403560Z",
+      "user_message": "thêm món ốc ở hàng lược 100k",
+      "assistant_response": "Đã xong! Hóa đơn ốc của bạn tại Hàng Lược đã được lưu vào hệ thống. Nếu có thêm bất kỳ chi tiêu nào khác, cứ cho mình biết nhé!"
+    },
+    {
+      "turn_id": "XIK9ad-LFKXFvr0P2aumyAE",
+      "create_time": "2026-03-20T17:22:38.936823Z",
+      "user_message": "thêm món ốc ở hàng lược 100k",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "V4K9aYSkMcmk0-kPocKK4As",
+      "create_time": "2026-03-20T17:22:34.691354Z",
+      "user_message": "thêm món ốc ở hàng lược 100k",
+      "assistant_response": "Tuyệt vời, mình đã ghi lại món ốc tại Hàng Lược với giá 100.000đ cho bạn nhé! Có vẻ như đây là một bữa ăn khá thú vị đấy. Bạn có muốn điều chỉnh g"
+    },
+    {
+      "turn_id": "VoK9aZytDsv_2roPvrOl2Qs",
+      "create_time": "2026-03-20T17:22:33.102082Z",
+      "user_message": "thêm món ốc ở hàng lược 100k",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "HYK9aeqmGbbZ1e8Pu5y3qAo",
+      "create_time": "2026-03-20T17:21:35.833630Z",
+      "user_message": "cập nhật tông giọng talkative",
+      "assistant_response": "Tuyệt vời! Hóa đơn Phê La đã được lưu an toàn vào hệ thống rồi nhé. Cảm ơn bạn đã tin tưởng mình, chúc bạn có một ngày làm việc thật năng suất và đ "
+    },
+    {
+      "turn_id": "HIK9aZL5AuGw0-kPvYG7gQ4",
+      "create_time": "2026-03-20T17:21:35.060291Z",
+      "user_message": "cập nhật tông giọng talkative",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "FIK9aYL7Mbyj1e8P9prDsQo",
+      "create_time": "2026-03-20T17:21:27.306818Z",
+      "user_message": "cập nhật tông giọng talkative",
+      "assistant_response": "Gấm của Phê La uống \"đỉnh\" khỏi bàn luôn! 🍵 Mình đã lưu lại hóa đơn cho bạn rồi đây. Bạn xem qua thẻ thông tin nhé, nếu mọi thứ đã chuẩn xác rồi thì"
+    },
+    {
+      "turn_id": "E4K9aYDHGNSv0-kPnKe7oAw",
+      "create_time": "2026-03-20T17:21:25.999296Z",
+      "user_message": "cập nhật tông giọng talkative",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "_4G9afugON_82roPmaKYgA0",
+      "create_time": "2026-03-20T17:21:06.735554Z",
+      "user_message": "cập nhật tông giọng talkative",
+      "assistant_response": "Đã xong! Mình đã cập nhật tông giọng thành \"talkative\" rồi nhé. Từ giờ mình sẽ trò chuyện sôi nổi và nhiệt tình hơn với bạn. Có hóa đơn nào cần mình xử "
+    },
+    {
+      "turn_id": "_oG9adWAE9ia1e8Ph5-S6AY",
+      "create_time": "2026-03-20T17:21:04.575080Z",
+      "user_message": "cập nhật tông giọng talkative",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "qH29abiZMqub1e8P14HIgAo",
+      "create_time": "2026-03-20T17:02:36.072956Z",
+      "user_message": "thêm record mua bánh tráng 20k ở công viên Cầu Giấy",
+      "assistant_response": "Hiện tại, tôi đã rà soát toàn bộ lịch sử chi tiêu của bạn nhưng không tìm thấy mục nào liên quan đến \"cafe\".\n\nCó thể bạn chưa ghi lại các khoản chi này ho "
+    },
+    {
+      "turn_id": "p329aYTSIOCn1e8P4rnZ0Q8",
+      "create_time": "2026-03-20T17:02:33.976397Z",
+      "user_message": "thêm record mua bánh tráng 20k ở công viên Cầu Giấy",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "nn29acnuEKun1e8PmYza8Ak",
+      "create_time": "2026-03-20T17:02:25.437512Z",
+      "user_message": "thêm record mua bánh tráng 20k ở công viên Cầu Giấy",
+      "assistant_response": "Trong 1 tháng qua, tôi chưa ghi nhận dữ liệu về các giao dịch liên quan đến \"cafe\" của bạn. \n\nNếu bạn đã từng ghi lại chi tiêu cafe nhưng không dùng từ khóa này"
+    },
+    {
+      "turn_id": "nX29aYyoB_jt1e8P6e6b4Qk",
+      "create_time": "2026-03-20T17:02:23.866280Z",
+      "user_message": "thêm record mua bánh tráng 20k ở công viên Cầu Giấy",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "jX29aa-JPJHQ1e8Ppc_V-Qk",
+      "create_time": "2026-03-20T17:02:08.593777Z",
+      "user_message": "thêm record mua bánh tráng 20k ở công viên Cầu Giấy",
+      "assistant_response": "Đã lưu xong! Bạn cần hỗ trợ thêm gì không?"
+    },
+    {
+      "turn_id": "jX29adKFAsKf0-kPpp_0wQ0",
+      "create_time": "2026-03-20T17:02:07.782291Z",
+      "user_message": "thêm record mua bánh tráng 20k ở công viên Cầu Giấy",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "in29ac2LAv-11e8PvJ74wAk",
+      "create_time": "2026-03-20T17:02:05.341704Z",
+      "user_message": "thêm record mua bánh tráng 20k ở công viên Cầu Giấy",
+      "assistant_response": "Tôi đã ghi lại thông tin:\n- **Địa điểm:** Công viên Cầu Giấy\n- **Mặt hàng:** Bánh tráng (20.000d)\n- **Tổng cộng:** 20.000d\n\nBạn có muốn xác nhận lưu lại thông ti"
+    },
+    {
+      "turn_id": "iH29abLFKdae0-kPkffK0Ag",
+      "create_time": "2026-03-20T17:02:02.839668Z",
+      "user_message": "thêm record mua bánh tráng 20k ở công viên Cầu Giấy",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "LHu9abK4A_-11e8PvJ74wAk",
+      "create_time": "2026-03-20T16:51:59.221100Z",
+      "user_message": "mua thịt bò 100k ở chợ dịch vọng hậu hà nội",
+      "assistant_response": "Đã xong! Phân tích chi tiêu này đã được ghi nhớ. Bạn có cần tôi giúp thực hiện thêm tác vụ nào khác không, như thêm biên lai mới hay kiểm tra hạn mức chi ti "
+    },
+    {
+      "turn_id": "Inu9aZSkFvqZ0-kP1eid8Qs",
+      "create_time": "2026-03-20T16:51:49.772993Z",
+      "user_message": "mua thịt bò 100k ở chợ dịch vọng hậu hà nội",
+      "assistant_response": "Dưới đây là so sánh chi tiêu theo danh mục giữa **Tháng 3/2026** và **Tháng 2/2026**:\n\n| Danh mục | Tháng 3/2026 | Tháng 2/2026 | Thay đổi |\n| :--- | :--- | :--- | :--- |\n| **Din"
+    },
+    {
+      "turn_id": "2Hq9aamRDNiIosUPtKy2mQo",
+      "create_time": "2026-03-20T16:50:35.885654Z",
+      "user_message": "mua thịt bò 100k ở chợ dịch vọng hậu hà nội",
+      "assistant_response": "Dưới đây là phân tích chi tiêu của bạn theo danh mục (category) trong tháng 3/2026:\n\n*   **Dining (Ăn uống ngoài):** 600.000 VNĐ (40%)\n*   **Grocery (Đi chợ/Siêu thị):** 450"
+    },
+    {
+      "turn_id": "0nq9adOLOZSd0-kP0Z2OyQ0",
+      "create_time": "2026-03-20T16:50:29.543293Z",
+      "user_message": "mua thịt bò 100k ở chợ dịch vọng hậu hà nội",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "xHq9aZKcOqe10-kPypW9-Qs",
+      "create_time": "2026-03-20T16:50:15.623832Z",
+      "user_message": "mua thịt bò 100k ở chợ dịch vọng hậu hà nội",
+      "assistant_response": "Great! I'm glad that was helpful. Do you have any new receipts to scan, or would you like to see another analysis?"
+    },
+    {
+      "turn_id": "v3q9aY7gHZmj1e8P0tav6A8",
+      "create_time": "2026-03-20T16:50:10.996364Z",
+      "user_message": "mua thịt bò 100k ở chợ dịch vọng hậu hà nội",
+      "assistant_response": "Dựa trên dữ liệu chi tiêu của bạn trong tháng 3/2026:\n\n*   **Tổng số tiền cho đồ uống:** 450.000 VNĐ\n*   **Số lần mua:** 4 lần\n*   **Các loại đồ uống phổ biế"
+    },
+    {
+      "turn_id": "uHq9ac6QIea30-kP1dKA8Q0",
+      "create_time": "2026-03-20T16:50:02.571659Z",
+      "user_message": "mua thịt bò 100k ở chợ dịch vọng hậu hà nội",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "nXq9af3eEv-20-kPpeixoAw",
+      "create_time": "2026-03-20T16:49:36.401872Z",
+      "user_message": "mua thịt bò 100k ở chợ dịch vọng hậu hà nội",
+      "assistant_response": "Great! The receipt has been saved successfully. Let me know if you have any more receipts to log!"
+    },
+    {
+      "turn_id": "nHq9adzKEMqk0-kPts6IyQg",
+      "create_time": "2026-03-20T16:49:35.017474Z",
+      "user_message": "mua thịt bò 100k ở chợ dịch vọng hậu hà nội",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "jHq9ad7wL4Wg2roP8Yq3-Q0",
+      "create_time": "2026-03-20T16:49:18.955243Z",
+      "user_message": "mua thịt bò 100k ở chợ dịch vọng hậu hà nội",
+      "assistant_response": "Done! I've logged the purchase of \"thịt bò\" at \"Chợ Dịch Vọng Hậu\" for 100,000 VND. Does this look correct, or would you like to make any edits?"
+    },
+    {
+      "turn_id": "i3q9abWbD4vN1e8PvcmOgAo",
+      "create_time": "2026-03-20T16:49:17.072296Z",
+      "user_message": "mua thịt bò 100k ở chợ dịch vọng hậu hà nội",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "Z3q9aeCfCI220-kP5urd0A0",
+      "create_time": "2026-03-20T16:48:42.224957Z",
+      "user_message": "Reply with just the word: OK",
+      "assistant_response": "OK"
+    },
+    {
+      "turn_id": "az69aZqhJLXn1e8PyKzF8AY",
+      "create_time": "2026-03-20T12:32:46.125462Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "5J-7afzBKLmL1e8PlaWCuQk",
+      "create_time": "2026-03-19T07:04:06.918064Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "ol25abumJN2p2roPnfSY2QU",
+      "create_time": "2026-03-17T13:56:53.933143Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "ePq4afy6I7Gpvr0PwezL8QY",
+      "create_time": "2026-03-17T06:53:47.166919Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "gv63abK0E9Hu2roP0_SrwQ0",
+      "create_time": "2026-03-16T12:58:44.103305Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "oP23acbkCYH_2roPwozvgQg",
+      "create_time": "2026-03-16T12:54:58.227899Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "zfG3aenhC6ST9tMP6Ma7-AY",
+      "create_time": "2026-03-16T12:04:31.508674Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "fNG2abeDDO7M2roP_4qwmA8",
+      "create_time": "2026-03-15T15:34:24.035732Z",
+      "user_message": "tôi đã uống gì ở Starbucks gần nhất?",
+      "assistant_response": "Dưới đây là danh sách 10 món hàng hoặc dịch vụ có tổng chi tiêu cao nhất của bạn:\n\n| Tên món / Dịch vụ | Tổng chi tiêu |\n| :--- | :--- |\n| **Bia Tiger Bạc** | 1.058"
+    },
+    {
+      "turn_id": "etG2aZn4J_6jvr0PkeqE4AU",
+      "create_time": "2026-03-15T15:34:20.727514Z",
+      "user_message": "tôi đã uống gì ở Starbucks gần nhất?",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "N9G2aeeTOuCc1e8P-ZqIgQc",
+      "create_time": "2026-03-15T15:33:15.253450Z",
+      "user_message": "tôi đã uống gì ở Starbucks gần nhất?",
+      "assistant_response": "Dưới đây là 5 món (hoặc danh mục) thuộc nhóm **Dining (Ăn uống)** chiếm chi phí cao nhất trong lịch sử chi tiêu của bạn:\n\n| Món / Danh mục | Tổng chi tiêu |\n| :---"
+    },
+    {
+      "turn_id": "NtG2afbsOb-6vr0P8NS7sQQ",
+      "create_time": "2026-03-15T15:33:13.600112Z",
+      "user_message": "tôi đã uống gì ở Starbucks gần nhất?",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "D9G2aYCZL9yZ0-kP4M-j4A0",
+      "create_time": "2026-03-15T15:32:34.859004Z",
+      "user_message": "tôi đã uống gì ở Starbucks gần nhất?",
+      "assistant_response": "Dưới đây là chi tiết tổng chi tiêu của bạn theo từng nhóm ngành hàng:\n\n| Nhóm ngành | Tổng chi tiêu |\n| :--- | :--- |\n| **Dining (Ăn uống)** | 7.586.822đ |\n| **Cafe** | 1."
+    },
+    {
+      "turn_id": "DtG2ab7HJ-aT9tMPgrGA6Qg",
+      "create_time": "2026-03-15T15:32:32.296124Z",
+      "user_message": "tôi đã uống gì ở Starbucks gần nhất?",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "-dC2aZjGDKDp2roPkP3xoAc",
+      "create_time": "2026-03-15T15:32:11.768872Z",
+      "user_message": "tôi đã uống gì ở Starbucks gần nhất?",
+      "assistant_response": "Trong 2 tháng gần đây, tổng số tiền bạn đã chi tiêu là **12.863.773đ**."
+    },
+    {
+      "turn_id": "-NC2aeXYDY__2roP7sbm8AY",
+      "create_time": "2026-03-15T15:32:10.797998Z",
+      "user_message": "tôi đã uống gì ở Starbucks gần nhất?",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "9tC2aYvmGOai1e8P4PraqQw",
+      "create_time": "2026-03-15T15:32:08.167973Z",
+      "user_message": "tôi đã uống gì ở Starbucks gần nhất?",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "9NC2aYW0Kdbk1e8Puq-C2Ag",
+      "create_time": "2026-03-15T15:32:06.896573Z",
+      "user_message": "tôi đã uống gì ở Starbucks gần nhất?",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "ydC2adu2HfWV1e8P1oaHsQI",
+      "create_time": "2026-03-15T15:31:23.492296Z",
+      "user_message": "tôi đã uống gì ở Starbucks gần nhất?",
+      "assistant_response": "Tại cửa hàng Starbucks gần nhất (tại Sentosa Sky Park, Hải Phòng vào ngày 05/03/2026), bạn đã gọi các món sau:\n\n*   **Brown Sugar Oatmilk Iced Shaken Espresso** (102.000đ)\n*  "
+    },
+    {
+      "turn_id": "yNC2abLeDomS9tMPtq7F6AY",
+      "create_time": "2026-03-15T15:31:22.020792Z",
+      "user_message": "tôi đã uống gì ở Starbucks gần nhất?",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "ENC2afORNObz1e8Pwt6UkQc",
+      "create_time": "2026-03-15T15:28:19.340835Z",
+      "user_message": "tôi đã uống gì ở Starbucks gần nhất?",
+      "assistant_response": "Tôi rất tiếc, nhưng tôi không tìm thấy bất kỳ biên lai nào từ **Starbucks** trong dữ liệu của bạn.\n\nDựa trên lịch sử của bạn, các cửa hàng café/bánh ngọt "
+    },
+    {
+      "turn_id": "D9C2aZmoJbWL1e8PpbaVwQY",
+      "create_time": "2026-03-15T15:28:18.253629Z",
+      "user_message": "tôi đã uống gì ở Starbucks gần nhất?",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "DtC2aYi0GoSS9tMP3YbzyAo",
+      "create_time": "2026-03-15T15:28:16.864833Z",
+      "user_message": "tôi đã uống gì ở Starbucks gần nhất?",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "DdC2aZ-NF4ae1e8P-sOosQs",
+      "create_time": "2026-03-15T15:28:15.151429Z",
+      "user_message": "tôi đã uống gì ở Starbucks gần nhất?",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "jsq2acSZNvGw2roPtfWSqA0",
+      "create_time": "2026-03-15T15:04:48.619090Z",
+      "user_message": "how search works",
+      "assistant_response": "The last time you visited Saint Honoré (on March 15th), you ordered a **Cannelés Coffee**, which was 40.000đ.\n\nHere is your full order from that visit:\n*   **Brioche 200Gr**: 68.000đ\n*   **Cannel "
+    },
+    {
+      "turn_id": "jcq2aarwB8GS0-kPzPTvwAs",
+      "create_time": "2026-03-15T15:04:47.055744Z",
+      "user_message": "how search works",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "d8q2aa-tNoyY0-kPlsv26As",
+      "create_time": "2026-03-15T15:04:26.164621Z",
+      "user_message": "how search works",
+      "assistant_response": "I couldn't find any receipts from \"Starbucks\" in your history. In fact, checking your records, it looks like you haven't visited a Starbucks yet—the only café-related merchant I see in your data is"
+    },
+    {
+      "turn_id": "dsq2abqwCo6Y0-kP9-LqgQw",
+      "create_time": "2026-03-15T15:04:23.847394Z",
+      "user_message": "how search works",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "dMq2aemUIdO50-kP5NGj-Qw",
+      "create_time": "2026-03-15T15:04:23.071804Z",
+      "user_message": "how search works",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "c8q2afXaKZaS0-kPpObqiQo",
+      "create_time": "2026-03-15T15:04:21.474995Z",
+      "user_message": "how search works",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "QMq2aa64Ivax0-kPmJXwgQ4",
+      "create_time": "2026-03-15T15:03:30.950072Z",
+      "user_message": "how search works",
+      "assistant_response": "The search feature allows you to find specific receipts by looking for keywords. Here is how you can use it effectively:\n\n*   **What it searches:** You can search by merchant name (e.g., \"Starbucks\"),"
+    },
+    {
+      "turn_id": "Psq2ab_GING50-kPjZbU-AY",
+      "create_time": "2026-03-15T15:03:28.785629Z",
+      "user_message": "how search works",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "XKm2abps07nT6Q_k0aP5DA",
+      "create_time": "2026-03-15T12:43:10.322909Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "LH-2aYzUEIj92roPtKiH-Qw",
+      "create_time": "2026-03-15T09:43:10.109684Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "6oO1aeyrB9PV1e8P5r6XgQY",
+      "create_time": "2026-03-14T15:51:08.652944Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "_RC1aZ3RK6CJosUPof7oyA4",
+      "create_time": "2026-03-14T07:40:48.260874Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "6RC1aZepGtbk1e8PhfLFiAM",
+      "create_time": "2026-03-14T07:40:27.744173Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "2hC1aYzPN_TS1e8Pqpr40AY",
+      "create_time": "2026-03-14T07:40:13.297485Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "rhC1abyXHdK10-kPqY-52Ao",
+      "create_time": "2026-03-14T07:39:28.294114Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "hRC1ae2BH8zm2roP9da5wQ0",
+      "create_time": "2026-03-14T07:38:47.522548Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "UxC1aayiCt_JrfcPvYiZ2A0",
+      "create_time": "2026-03-14T07:37:57.111006Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "LRC1aaaVKeGAvr0P8ZGo4A4",
+      "create_time": "2026-03-14T07:37:19.984483Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "Sd60aZCBKNDu2roP7u-E-As",
+      "create_time": "2026-03-14T04:04:28.342981Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "wsq0afzRO97PrfcP4ZWIwAk",
+      "create_time": "2026-03-14T02:41:09.435626Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "SMe0aZfyHOOivr0P3KHdsAw",
+      "create_time": "2026-03-14T02:26:18.747854Z",
+      "user_message": "Reply with exactly: OK",
+      "assistant_response": "OK"
+    },
+    {
+      "turn_id": "Dvyzae68I-WL0-kP3vj1mAc",
+      "create_time": "2026-03-13T11:59:12.833797Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "4PuzacDMMouivr0Phvzf-Qs",
+      "create_time": "2026-03-13T11:58:27.336372Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "tcGzaaa5KPKM2roP3JDCuAw",
+      "create_time": "2026-03-13T07:50:15.786068Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "EMGzaYSGJdPV1e8P5r6XgQY",
+      "create_time": "2026-03-13T07:47:30.618190Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "6rizaf-sHNbb1e8Pn9mWuQ4",
+      "create_time": "2026-03-13T07:12:44.681032Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "0rizaeH2D8zm2roP9da5wQ0",
+      "create_time": "2026-03-13T07:12:20.359385Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "t7izaZjwDdqo2roPn-ap4As",
+      "create_time": "2026-03-13T07:11:53.339708Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "kbizafaAK5aivr0Pq4W9kQ8",
+      "create_time": "2026-03-13T07:11:15.830107Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "Pbizaf2DJuyZ1e8P07OimAI",
+      "create_time": "2026-03-13T07:09:52.064179Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "H7izaZOzLqCcosUPzYPj-Aw",
+      "create_time": "2026-03-13T07:09:21.388380Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "9LezadmiIKWQ9tMPqbyG4Qs",
+      "create_time": "2026-03-13T07:08:37.972276Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "xLezac7tH6WQ9tMPqbyG4Qs",
+      "create_time": "2026-03-13T07:07:50.590134Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "Yrezaan3M_W30-kPypSy8Qk",
+      "create_time": "2026-03-13T07:06:13.081666Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "Grezabn5AZO9vr0Pp93j-As",
+      "create_time": "2026-03-13T07:05:00.229946Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "ArezabPDG9SO9tMP-pad2As",
+      "create_time": "2026-03-13T07:04:36.544982Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "5bazae2OLt620-kP3JvqiQg",
+      "create_time": "2026-03-13T07:04:07.404164Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "ybazaY_WFK3_1e8P-IzkoA0",
+      "create_time": "2026-03-13T07:03:39.418956Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "qrWzaYnxKoezvr0Pq-68gAw",
+      "create_time": "2026-03-13T06:58:53.077074Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "JrWzaanVI8qf0-kPusyXgAk",
+      "create_time": "2026-03-13T06:56:40.779582Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "HqupacaOFOjn0-kPoaXWoQo",
+      "create_time": "2026-03-05T16:11:13.747797Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "_aqpaZX0Ntee2roP9u7QgQU",
+      "create_time": "2026-03-05T16:10:41.182353Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    },
+    {
+      "turn_id": "paqpaaHcAqGr2roP-4vxSA",
+      "create_time": "2026-03-05T16:09:12.703334Z",
+      "user_message": "Here is a receipt photo. Please parse it.",
+      "assistant_response": null
+    }
+  ]
+}

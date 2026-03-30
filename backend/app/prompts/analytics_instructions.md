@@ -39,7 +39,7 @@ or asks to *find* or *show* receipts.
 
 ---
 
-### 2. `run_query` — SQLAlchemy analytics query
+### 2. `run_query` — SQL analytics query
 
 **When to use:** The user asks for aggregates, totals, trends, comparisons,
 breakdowns, or any question that requires computation across multiple receipts.
@@ -47,34 +47,26 @@ breakdowns, or any question that requires computation across multiple receipts.
 **Parameters:**
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `query_code` | string | Valid Python code using SQLAlchemy; must assign to `result` |
+| `sql_query` | string | Raw SQL SELECT query; must include `:user_id` parameter for filtering |
 
-**Execution environment — available names:**
+**Execution environment — available tables:**
 
-| Name | Type | Description |
-|------|------|-------------|
-| `session` | `Session` | SQLAlchemy session (read-only) |
-| `select` | function | SQLAlchemy `select()` |
-| `func` | module | SQLAlchemy `func` (sum, count, avg, …) |
-| `and_`, `or_` | function | Logical combinators |
-| `desc`, `asc` | function | Ordering |
-| `case`, `cast`, `Float`, `Integer` | — | Type casting |
-| `date`, `datetime`, `timedelta` | class | Date math helpers for time-range analytics |
-| `Receipt` | ORM model | Columns: `id` (UUID), `user_id` (UUID), `merchant_name`, `merchant_address`, `receipt_datetime`, `billing_period`, `category`, `source`, `currency`, `subtotal`, `discount`, `tax_rate`, `tax_amount`, `total`, `notes`, `created_at` |
-| `ReceiptItem` | ORM model | Columns: `id` (UUID), `receipt_id` (UUID), `name`, `name_raw`, `quantity`, `unit_price`, `amount`, `confidence`, `toppings`, `modifiers`, `food_tags` |
-| `user_id` | UUID | **Pre-injected constant** — always use this to scope queries |
+| Table | Description |
+|-------|-------------|
+| `receipts` | Columns: `id` (UUID), `user_id` (UUID), `merchant_name`, `merchant_address`, `receipt_datetime`, `billing_period`, `category`, `source`, `currency`, `subtotal`, `discount`, `tax_rate`, `tax_amount`, `total`, `notes`, `created_at` |
+| `receipt_items` | Columns: `id` (UUID), `receipt_id` (UUID), `name`, `name_raw`, `quantity`, `unit_price`, `amount`, `confidence`, `toppings`, `modifiers`, `food_tags` |
+| `users` | Columns: `id` (UUID), `telegram_id`, `username`, `first_name`, `created_at`, `updated_at` |
 
 **Mandatory rules:**
-1. **Always** filter `Receipt.user_id == user_id` — `user_id` is provided for you.
-2. **Always** assign your final answer to `result`.
-3. **Never** use `import`, `open`, `exec`, `eval`, or any write operation.
-4. Keep code concise; prefer list comprehensions over loops.
-5. For date filtering use `Receipt.receipt_datetime` (Python `datetime` objects).
+1. **Always** include `:user_id` parameter in WHERE clause — it is provided for you.
+2. **Only** SELECT statements are allowed — no INSERT, UPDATE, DELETE, DROP, etc.
+3. **Never** use string concatenation for user input — always use parameterized queries.
+4. Keep queries concise and efficient.
+5. For date filtering use SQL date functions on `receipts.receipt_datetime`.
 
 **Date field semantics:**
 - Use `receipt_datetime` for spending-time questions ("last week", "this month", etc.).
-- Use `created_at` only when explicitly asked about when receipts were saved into Receipt Pal.
-
+- Use SQL functions like `DATE_TRUNC()`, `CURRENT_DATE`, `INTERVAL` for date calculations.
 
 **Multilingual date normalization:**
 - Do not assume English-only date phrases.
@@ -88,55 +80,78 @@ breakdowns, or any question that requires computation across multiple receipts.
 **Pattern examples:**
 
 Total spending by category:
-```python
-stmt = (
-    select(Receipt.category, func.sum(Receipt.total).label("total"), func.count(Receipt.id).label("count"))
-    .where(Receipt.user_id == user_id)
-    .group_by(Receipt.category)
-    .order_by(func.sum(Receipt.total).desc())
-)
-rows = session.execute(stmt).all()
-result = [{"category": r.category, "total": r.total, "count": r.count} for r in rows]
+```sql
+SELECT 
+    category, 
+    SUM(total) as total_spent, 
+    COUNT(*) as receipt_count
+FROM receipts
+WHERE user_id = :user_id
+GROUP BY category
+ORDER BY total_spent DESC;
 ```
 
 Top merchants by spend:
-```python
-stmt = (
-    select(Receipt.merchant_name, func.sum(Receipt.total).label("total"))
-    .where(Receipt.user_id == user_id)
-    .group_by(Receipt.merchant_name)
-    .order_by(func.sum(Receipt.total).desc())
-    .limit(10)
-)
-rows = session.execute(stmt).all()
-result = [{"merchant": r.merchant_name, "total": r.total} for r in rows]
+```sql
+SELECT 
+    merchant_name, 
+    SUM(total) as total_spent
+FROM receipts
+WHERE user_id = :user_id
+GROUP BY merchant_name
+ORDER BY total_spent DESC
+LIMIT 10;
 ```
 
 Total spending in the last 7 days:
-```python
-start_dt = datetime.now() - timedelta(days=7)
-stmt = select(func.sum(Receipt.total).label("total")).where(
-    Receipt.user_id == user_id,
-    Receipt.receipt_datetime >= start_dt,
-)
-row = session.execute(stmt).one()
-result = {"total": row.total or 0}
+```sql
+SELECT 
+    SUM(total) as total_spent
+FROM receipts
+WHERE user_id = :user_id
+  AND receipt_datetime >= CURRENT_DATE - INTERVAL '7 days';
 ```
 
 Total spending in current calendar month:
-```python
-today = date.today()
-month_start = date(today.year, today.month, 1)
-next_month = (month_start.replace(day=28) + timedelta(days=4)).replace(day=1)
-month_start_dt = datetime(month_start.year, month_start.month, month_start.day)
-next_month_dt = datetime(next_month.year, next_month.month, next_month.day)
-stmt = select(func.sum(Receipt.total).label("total")).where(
-    Receipt.user_id == user_id,
-    Receipt.receipt_datetime >= month_start_dt,
-    Receipt.receipt_datetime < next_month_dt,
-)
-row = session.execute(stmt).one()
-result = {"month": month_start.isoformat(), "total": row.total or 0}
+```sql
+SELECT 
+    SUM(total) as total_spent
+FROM receipts
+WHERE user_id = :user_id
+  AND DATE_TRUNC('month', receipt_datetime) = DATE_TRUNC('month', CURRENT_DATE);
+```
+
+Items purchased most frequently:
+```sql
+SELECT 
+    ri.name, 
+    SUM(ri.quantity) as total_quantity,
+    COUNT(*) as purchase_count
+FROM receipt_items ri
+JOIN receipts r ON ri.receipt_id = r.id
+WHERE r.user_id = :user_id
+GROUP BY ri.name
+ORDER BY total_quantity DESC
+LIMIT 10;
+```
+
+**❌ Invalid patterns (will be rejected):**
+
+```sql
+-- ❌ Missing user_id filter
+SELECT category, SUM(total) FROM receipts GROUP BY category;
+
+-- ❌ INSERT statement
+INSERT INTO receipts (total) VALUES (1000);
+
+-- ❌ String concatenation (SQL injection risk)
+SELECT * FROM receipts WHERE merchant_name = ''' || user_input || ''';
+
+-- ❌ Multiple statements
+SELECT * FROM receipts; DROP TABLE receipts;
+
+-- ❌ UNION-based injection attempt
+SELECT * FROM receipts WHERE user_id = :user_id UNION SELECT password FROM users;
 ```
 
 ---

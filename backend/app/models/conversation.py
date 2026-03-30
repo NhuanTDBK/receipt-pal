@@ -2,8 +2,8 @@ import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text, func
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text, func, JSON
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -60,9 +60,9 @@ class ConversationMessage(Base):
         String(50), nullable=False
     )  # user / assistant / tool
     content: Mapped[str | None] = mapped_column(Text, nullable=True)
-    image_file_ids: Mapped[list | None] = mapped_column(JSONB, nullable=True)
+    image_file_ids: Mapped[list | None] = mapped_column(JSON, nullable=True)
     tool_name: Mapped[str | None] = mapped_column(String(100), nullable=True)
-    tool_args: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    tool_args: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )

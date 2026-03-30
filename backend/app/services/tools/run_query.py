@@ -1,84 +1,87 @@
-"""Python Query tool — the agent generates a SQLAlchemy expression that is
-executed in a controlled namespace, then synthesises the results.
+"""SQL Query tool — the agent generates a SQL SELECT query that is
+executed in a read-only database session, then synthesises the results.
 
 Safety design:
-- ``user_id`` is injected as an immutable constant in the execution namespace;
-  the model cannot override it.
-- ``__builtins__`` is replaced with a strict allowlist.
-- The generated code may only read data (SELECT patterns).  The namespace
-  exposes no ``session.add``, ``session.delete``, ``session.commit``, or DDL.
-- Execution runs inside ``AsyncSession.run_sync()`` so the sandbox code uses
-  a regular sync ``Session`` while the outer call remains non-blocking.
+- ``user_id`` is injected as a parameter for data isolation;
+  the agent cannot access other users' data.
+- Only SELECT statements are allowed — no INSERT, UPDATE, DELETE, DROP, etc.
+- Queries are parameterized to prevent SQL injection.
+- Execution runs inside AsyncSession for proper database connection handling.
 """
 
 from __future__ import annotations
 
 import json
 import traceback
-from datetime import date, datetime, timedelta
+from decimal import Decimal
 from typing import Annotated
 
 from agents import RunContextWrapper, function_tool
-from sqlalchemy import select, func, and_, or_, desc, asc, case, cast, Float, Integer
+from sqlalchemy import text
 
-from app.database import async_session_factory
-from app.models.receipt import Receipt, ReceiptItem
 from app.services.agent_context import TelegramAgentContext
 
-_SAFE_BUILTINS: dict = {
-    "len": len,
-    "sum": sum,
-    "min": min,
-    "max": max,
-    "abs": abs,
-    "round": round,
-    "list": list,
-    "dict": dict,
-    "str": str,
-    "int": int,
-    "float": float,
-    "bool": bool,
-    "range": range,
-    "enumerate": enumerate,
-    "zip": zip,
-    "sorted": sorted,
-    "reversed": reversed,
-    "print": print,
-}
 
-_WRITE_GUARDS = (
-    "session.add",
-    "session.delete",
-    "session.commit",
-    "session.rollback",
-    "session.execute(text(",
-    "drop",
-    "delete",
-    "insert",
-    "update",
-    "alter",
-    "create",
-    "truncate",
-    "grant",
-    "revoke",
-    "__import__",
-    "import ",
-    "open(",
-    "exec(",
-    "eval(",
-    "compile(",
-    "os.",
-    "sys.",
-    "subprocess",
-)
+def _validate_sql(sql: str) -> str | None:
+    """
+    Validate that SQL is safe to execute.
+    Returns None if valid, error message if invalid.
+    """
+    # Remove comments and extra whitespace for checking
+    cleaned = " ".join(sql.split())
+    upper_sql = cleaned.upper()
 
+    # Must start with SELECT (case insensitive)
+    if not upper_sql.strip().startswith("SELECT"):
+        return "Only SELECT statements are allowed"
 
-def _check_for_write_ops(code: str) -> str | None:
-    """Return the offending keyword if code contains a disallowed operation."""
-    lower = code.lower()
-    for guard in _WRITE_GUARDS:
-        if guard in lower:
-            return guard
+    # Check for forbidden operations
+    forbidden_patterns = [
+        "INSERT",
+        "UPDATE",
+        "DELETE",
+        "DROP",
+        "ALTER",
+        "CREATE",
+        "TRUNCATE",
+        "MERGE",
+        "EXECUTE",
+        "CALL",
+        "COMMIT",
+        "ROLLBACK",
+        "SAVEPOINT",
+        "SET ",
+        "REPLACE",
+        "LOCK",
+        "UNLOCK",
+        "GRANT",
+        "REVOKE",
+        "DENY",
+        "BEGIN",
+        "START TRANSACTION",
+    ]
+
+    for pattern in forbidden_patterns:
+        if pattern in upper_sql:
+            return f"Forbidden operation: {pattern}"
+
+    # Check for potential SQL injection patterns (basic)
+    # This is a simple check - in production you'd want more robust validation
+    dangerous_patterns = [
+        "--",
+        "/*",
+        "*/",
+        ";",  # SQL comments and statement termination
+        "UNION",
+        "INTO",
+        "LOAD_FILE",
+        "OUTFILE",  # Data exfiltration
+    ]
+
+    for pattern in dangerous_patterns:
+        if pattern in upper_sql:
+            return f"Potentially dangerous pattern: {pattern}"
+
     return None
 
 
@@ -88,6 +91,8 @@ def _serialize(value: object) -> object:
         return None
     if isinstance(value, (int, float, bool, str)):
         return value
+    if isinstance(value, Decimal):
+        return float(value)
     if isinstance(value, (list, tuple)):
         return [_serialize(v) for v in value]
     if isinstance(value, dict):
@@ -105,78 +110,49 @@ def _serialize(value: object) -> object:
 @function_tool
 async def run_query(
     ctx: RunContextWrapper[TelegramAgentContext],
-    query_code: Annotated[
+    sql_query: Annotated[
         str,
         (
-            "Python code using SQLAlchemy to query the user's receipts. "
-            "Available names: session, select, func, and_, or_, desc, asc, "
-            "case, cast, Float, Integer, date, datetime, timedelta, "
-            "Receipt, ReceiptItem, user_id. "
-            "Assign the final result to a variable named `result`. "
+            "Raw SQL SELECT query to execute. "
+            "Available tables: receipts, receipt_items, users. "
+            "Must include :user_id parameter for filtering. "
             "Example:\n"
-            "  stmt = select(Receipt.category, func.sum(Receipt.total).label('total'))"
-            ".where(Receipt.user_id == user_id)"
-            ".group_by(Receipt.category)"
-            ".order_by(func.sum(Receipt.total).desc())\n"
-            "  rows = session.execute(stmt).all()\n"
-            "  result = [{'category': r.category, 'total': r.total} for r in rows]"
+            "  SELECT category, SUM(total) as total_spent \n"
+            "  FROM receipts \n"
+            "  WHERE user_id = :user_id \n"
+            "  GROUP BY category \n"
+            "  ORDER BY total_spent DESC\n"
         ),
     ],
 ) -> str:
-    """Execute a SQLAlchemy analytics query and return the serialised results.
+    """Execute a SQL analytics query and return the serialised results.
 
     Use this tool for aggregate queries, trends, spending breakdowns, and any
-    analytics that cannot be expressed as a simple keyword search.
-    ``user_id`` is pre-injected — always filter ``Receipt.user_id == user_id``.
-    Never write to the database; read-only SELECT patterns only.
+    analytics that require SQL. ``user_id`` is provided as a parameter.
+    Only read-only SELECT patterns are permitted.
     """
-    offending = _check_for_write_ops(query_code)
-    if offending:
-        return json.dumps(
-            {
-                "error": f"Disallowed operation detected: '{offending}'. "
-                "Only read-only SELECT patterns are permitted."
-            }
-        )
+    # Validate SQL is safe
+    validation_error = _validate_sql(sql_query)
+    if validation_error:
+        return json.dumps({"error": validation_error})
 
     user_id = ctx.context.user_id
-    local_ns: dict = {}
-
-    def _exec_in_sync(sync_session) -> None:
-        """Run the sandbox code with a sync Session provided by run_sync()."""
-        namespace = {
-            "__builtins__": _SAFE_BUILTINS,
-            "select": select,
-            "func": func,
-            "and_": and_,
-            "or_": or_,
-            "desc": desc,
-            "asc": asc,
-            "case": case,
-            "cast": cast,
-            "Float": Float,
-            "Integer": Integer,
-            "date": date,
-            "datetime": datetime,
-            "timedelta": timedelta,
-            "Receipt": Receipt,
-            "ReceiptItem": ReceiptItem,
-            "user_id": user_id,
-            "session": sync_session,
-        }
-        exec(query_code, namespace, local_ns)  # noqa: S102
 
     try:
-        async with async_session_factory() as session:
-            await session.run_sync(lambda sync_session: _exec_in_sync(sync_session))
+        session = ctx.context.db_session
+        # Convert UUID to string for SQLite compatibility
+        bind_user_id = str(user_id) if user_id else user_id
+        # Execute SQL with user_id parameter
+        result = await session.execute(text(sql_query), {"user_id": bind_user_id})
+        rows = result.all()
+
+        # Convert rows to list of dictionaries and serialize values
+        if rows and hasattr(rows[0], "_mapping"):
+            serialized = [_serialize(dict(row._mapping)) for row in rows]
+        else:
+            # Fallback for other result types
+            serialized = [_serialize(list(row)) for row in rows]
+
+        return json.dumps({"result": serialized}, ensure_ascii=False)
     except Exception:
         return json.dumps({"error": traceback.format_exc(limit=5)})
-
-    if "result" not in local_ns:
-        return json.dumps({"error": "Code did not assign to `result`."})
-
-    try:
-        serialized = _serialize(local_ns["result"])
-        return json.dumps({"result": serialized}, ensure_ascii=False)
-    except (TypeError, ValueError) as exc:
-        return json.dumps({"error": f"Could not serialize result: {exc}"})

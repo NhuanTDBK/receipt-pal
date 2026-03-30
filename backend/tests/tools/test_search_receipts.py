@@ -144,20 +144,20 @@ async def test_search_receipts_respects_category_relative_and_iso_filters(
             build_generated_receipt_payload(
                 category="cafe",
                 merchant_name="Recent Cafe",
-                datetime="2026-03-27T10:00:00+00:00",
+                receipt_datetime="2026-03-27T10:00:00+00:00",
                 total=70000,
             ),
             build_generated_receipt_payload(
                 category="cafe",
                 merchant_name="Old Cafe",
-                datetime="2026-03-05T09:00:00+00:00",
+                receipt_datetime="2026-03-05T09:00:00+00:00",
                 total=50000,
                 index=1,
             ),
             build_generated_receipt_payload(
                 category="grocery",
                 merchant_name="Recent Grocery",
-                datetime="2026-03-26T18:00:00+00:00",
+                receipt_datetime="2026-03-26T18:00:00+00:00",
                 total=90000,
             ),
         ],

@@ -1,0 +1,83 @@
+{
+  "count": 5,
+  "receipts": [
+    {
+      "id": "a8bf56d7-cc27-4cf7-9bac-9183bffda9a3",
+      "turn_id": "a-_Iaa7lKNb_1e8Ph_qToAs",
+      "merchant": "bạn trong 7 ngày qua",
+      "date": "2025-03-15",
+      "total": null,
+      "items": [
+        {
+          "name": "- Siêu thị WinMart",
+          "price": 1250000
+        },
+        {
+          "name": "- Highland Coffee",
+          "price": 84000
+        }
+      ],
+      "raw_response": "Dưới đây là chi tiết 4 hóa đơn của bạn trong 7 ngày qua:\n\n*   **15/03/2025** - Siêu thị WinMart: 1.250.000đ (Grocery)\n*   **14/03/2025** - Highland Coffee: 84.000đ (Cafe)\n*   **12"
+    },
+    {
+      "id": "706f8398-3cd7-43d5-8060-e77a238d644d",
+      "turn_id": "in29ac2LAv-11e8PvJ74wAk",
+      "merchant": null,
+      "date": null,
+      "total": 20000,
+      "items": [
+        {
+          "name": "Bánh tráng",
+          "price": 20000
+        },
+        {
+          "name": "Tổng cộng:",
+          "price": 20000
+        }
+      ],
+      "raw_response": "Tôi đã ghi lại thông tin:\n- **Địa điểm:** Công viên Cầu Giấy\n- **Mặt hàng:** Bánh tráng (20.000d)\n- **Tổng cộng:** 20.000d\n\nBạn có muốn xác nhận lưu lại thông ti"
+    },
+    {
+      "id": "b7beee3e-dd6a-4949-b985-8a9e26b483a3",
+      "turn_id": "2Hq9aamRDNiIosUPtKy2mQo",
+      "merchant": "bạn theo danh mục (category) trong tháng 3/2026",
+      "date": null,
+      "total": null,
+      "items": [
+        {
+          "name": "Dining (Ăn uống ngoài):",
+          "price": 600000
+        }
+      ],
+      "raw_response": "Dưới đây là phân tích chi tiêu của bạn theo danh mục (category) trong tháng 3/2026:\n\n*   **Dining (Ăn uống ngoài):** 600.000 VNĐ (40%)\n*   **Grocery (Đi chợ/Siêu thị):** 450"
+    },
+    {
+      "id": "814b91bb-fe12-4772-81b3-9434d652bd1e",
+      "turn_id": "v3q9aY7gHZmj1e8P0tav6A8",
+      "merchant": "bạn trong tháng 3/2026",
+      "date": null,
+      "total": 450000,
+      "items": [
+        {
+          "name": "Tổng số tiền cho đồ uống:",
+          "price": 450000
+        }
+      ],
+      "raw_response": "Dựa trên dữ liệu chi tiêu của bạn trong tháng 3/2026:\n\n*   **Tổng số tiền cho đồ uống:** 450.000 VNĐ\n*   **Số lần mua:** 4 lần\n*   **Các loại đồ uống phổ biế"
+    },
+    {
+      "id": "7d04146e-5fcf-4e29-a929-8c65bd6d826c",
+      "turn_id": "ydC2adu2HfWV1e8P1oaHsQI",
+      "merchant": null,
+      "date": "2026-03-05",
+      "total": null,
+      "items": [
+        {
+          "name": "Brown Sugar Oatmilk Iced Shaken Espresso",
+          "price": 102000
+        }
+      ],
+      "raw_response": "Tại cửa hàng Starbucks gần nhất (tại Sentosa Sky Park, Hải Phòng vào ngày 05/03/2026), bạn đã gọi các món sau:\n\n*   **Brown Sugar Oatmilk Iced Shaken Espresso** (102.000đ)\n*  "
+    }
+  ]
+}
