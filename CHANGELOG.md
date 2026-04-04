@@ -6,6 +6,25 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ---
 
 
+## [v2.2.0] — 2026-04-04
+
+### Added
+- **Weekly usage reports** — automated weekly spending reports sent via Telegram every Sunday at 8 PM
+- **Report customization** — users can set custom formatting and AI analysis prompts for their reports
+- **Report opt-out** — users can enable/disable weekly reports via settings
+- **Report sections** — General stats (total spending, largest expense, transaction count) and Detail breakdown (spending by category with percentages)
+- **AI-powered insights** — personalized spending analysis and recommendations using LLM
+- **Markdown formatting** — reports use Markdown instead of HTML for better compatibility
+- **Test script** — `scripts/test_weekly_report.py` for previewing report output without database
+- **Database migration** — adds `weekly_usage_reports` table and weekly report settings to `user_settings`
+- **Scheduler integration** — new Sunday evening job for weekly report generation
+
+### Changed
+- **Report format** — switched from HTML to Markdown for better Telegram rendering
+- **Scheduler** — expanded from 3 jobs to 4 jobs (added weekly usage report)
+
+---
+
 ## [v2.1.6] — 2026-03-30
 
 ### Fixed
