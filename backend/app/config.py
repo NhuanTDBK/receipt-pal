@@ -48,5 +48,13 @@ class Settings(BaseSettings):
     telegram_network_retry_base_delay: float = 1.0
     telegram_polling_restart_delay: float = 3.0
 
+    # Scheduler settings
+    enable_scheduler: bool = True
+    scheduler_timezone: str = "Asia/Ho_Chi_Minh"
+    daily_memory_schedule: str = "02:00"  # HH:MM format
+    weekly_memory_schedule: str = "03:00"  # Monday at 3 AM
+    monthly_memory_schedule: str = "04:00"  # 1st of month at 4 AM
+    weekly_report_schedule: str = "20:00"  # Sunday at 8 PM
+
 
 settings = Settings()

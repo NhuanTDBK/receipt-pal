@@ -1,7 +1,8 @@
 import uuid
+from datetime import datetime
 from typing import Any
 
-from sqlalchemy import func, select
+from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -96,3 +97,32 @@ def _parse_datetime(value: str | None):
         return datetime.fromisoformat(value.replace("Z", "+00:00"))
     except (ValueError, TypeError):
         return None
+
+
+async def get_receipts_for_period(
+    session: AsyncSession, user_id: uuid.UUID, period_start: datetime, period_end: datetime
+) -> list[Receipt]:
+    """Get receipts for a user within a specific time period.
+
+    Args:
+        session: Database session
+        user_id: User UUID
+        period_start: Start of period (inclusive)
+        period_end: End of period (exclusive)
+
+    Returns:
+        List of receipts with items loaded
+    """
+    result = await session.execute(
+        select(Receipt)
+        .where(
+            and_(
+                Receipt.user_id == user_id,
+                Receipt.receipt_datetime >= period_start,
+                Receipt.receipt_datetime < period_end,
+            )
+        )
+        .options(selectinload(Receipt.items))
+        .order_by(Receipt.receipt_datetime.desc())
+    )
+    return list(result.scalars().all())

@@ -11,6 +11,7 @@ from app.database import Base
 if TYPE_CHECKING:
     from app.models.conversation import Conversation
     from app.models.receipt import Receipt
+    from app.models.weekly_usage_report import WeeklyUsageReport
 
 
 class User(Base):
@@ -33,3 +34,6 @@ class User(Base):
 
     conversations: Mapped[list["Conversation"]] = relationship(back_populates="user")
     receipts: Mapped[list["Receipt"]] = relationship(back_populates="user")
+    weekly_usage_reports: Mapped[list["WeeklyUsageReport"]] = relationship(
+        back_populates="user"
+    )
