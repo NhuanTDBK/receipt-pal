@@ -16,6 +16,7 @@ import argparse
 import asyncio
 import json
 import sys
+from datetime import datetime
 from pathlib import Path
 
 # Add backend to path
@@ -73,6 +74,9 @@ async def insert_data(extracted_data: dict, dry_run: bool = False):
                 session.add(conversation)
                 await session.flush()  # Get conversation ID
 
+                # Store conversation.started_at for potential use as receipt_datetime fallback
+                conversation_started_at = conversation.started_at
+
                 # Add conversation message
                 message = ConversationMessage(
                     conversation_id=conversation.id,
@@ -81,6 +85,21 @@ async def insert_data(extracted_data: dict, dry_run: bool = False):
                 )
                 session.add(message)
 
+                # Parse datetime - use conversation.started_at as fallback
+                receipt_datetime = None
+                if receipt_data.get("receipt_datetime"):
+                    try:
+                        receipt_datetime = datetime.fromisoformat(
+                            receipt_data["receipt_datetime"].replace("Z", "+00:00")
+                        )
+                    except (ValueError, TypeError):
+                        pass
+
+                # Use conversation.started_at as fallback if receipt_datetime is None
+                if receipt_datetime is None:
+                    receipt_datetime = conversation_started_at
+                    print(f"  ℹ Using conversation.started_at as receipt_datetime: {receipt_datetime.isoformat()}")
+
                 # Create receipt
                 receipt = Receipt(
                     id=receipt_data.get("id"),
@@ -88,7 +107,7 @@ async def insert_data(extracted_data: dict, dry_run: bool = False):
                     conversation_id=conversation.id,
                     merchant_name=receipt_data.get("merchant_name") or "Unknown",
                     merchant_address=receipt_data.get("merchant_address"),
-                    receipt_datetime=receipt_data.get("receipt_datetime"),
+                    receipt_datetime=receipt_datetime,
                     category=receipt_data.get("category", "other"),
                     total=receipt_data.get("total") or 0,
                     currency=receipt_data.get("currency", "VND"),

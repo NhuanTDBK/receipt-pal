@@ -100,6 +100,9 @@ async def insert_receipts(receipts_data: list, dry_run: bool = False):
                 session.add(conversation)
                 await session.flush()
 
+                # Store conversation.started_at for potential use as receipt_datetime fallback
+                conversation_started_at = conversation.started_at
+
                 # Add conversation message with raw response
                 raw_response = receipt_data.get("raw_response", "")
                 message = ConversationMessage(
@@ -111,7 +114,7 @@ async def insert_receipts(receipts_data: list, dry_run: bool = False):
                 )
                 session.add(message)
 
-                # Parse datetime
+                # Parse datetime - use conversation.started_at as fallback
                 receipt_datetime = None
                 if receipt_data.get("receipt_datetime"):
                     try:
@@ -120,6 +123,14 @@ async def insert_receipts(receipts_data: list, dry_run: bool = False):
                         )
                     except (ValueError, TypeError):
                         pass
+
+                # If receipt_datetime is still None, we'll use conversation.started_at after flush
+                use_conversation_started = receipt_datetime is None
+
+                # Use conversation.started_at as fallback if receipt_datetime is None
+                if use_conversation_started:
+                    receipt_datetime = conversation_started_at
+                    print(f"  ℹ Using conversation.started_at as receipt_datetime: {receipt_datetime.isoformat()}")
 
                 # Create receipt
                 receipt = Receipt(

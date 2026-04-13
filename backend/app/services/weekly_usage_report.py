@@ -75,17 +75,23 @@ async def generate_weekly_report_data(
     week_end = week_start + timedelta(days=7)
 
     # Get receipts for the week
+    # Note: PostgreSQL handles timezone-aware datetime comparisons correctly.
+    # week_start and week_end are in UTC+7, receipt_datetime is in UTC.
+    # The comparison will normalize both to a common timezone before comparing.
+    # We use COALESCE to fall back to created_at if receipt_datetime is NULL.
+    from sqlalchemy import func
+
     result = await session.execute(
         select(Receipt)
         .where(
             and_(
                 Receipt.user_id == user_id,
-                Receipt.receipt_datetime >= week_start,
-                Receipt.receipt_datetime < week_end,
+                func.coalesce(Receipt.receipt_datetime, Receipt.created_at) >= week_start,
+                func.coalesce(Receipt.receipt_datetime, Receipt.created_at) < week_end,
             )
         )
         .options(selectinload(Receipt.items))
-        .order_by(Receipt.receipt_datetime.desc())
+        .order_by(func.coalesce(Receipt.receipt_datetime, Receipt.created_at).desc())
     )
     receipts = list(result.scalars().all())
 
@@ -377,11 +383,14 @@ async def get_report_for_week(
     return result.scalar_one_or_none()
 
 
-async def get_current_week_start() -> datetime:
-    """Get the Monday of the current week in the configured timezone.
+async def get_current_week_start(weeks_ago: int = 0) -> datetime:
+    """Get the Monday of the current week (or a previous week) in the configured timezone.
+
+    Args:
+        weeks_ago: Number of weeks ago (0 = current week, 1 = previous week, etc.)
 
     Returns:
-        Monday of the current week as timezone-aware datetime
+        Monday of the specified week as timezone-aware datetime
     """
     tz = timezone(timedelta(hours=7))  # Asia/Ho_Chi_Minh (UTC+7)
     now = datetime.now(tz)
@@ -389,4 +398,9 @@ async def get_current_week_start() -> datetime:
     # Find Monday of the current week
     days_since_monday = now.weekday()  # Monday = 0
     current_monday = now - timedelta(days=days_since_monday)
+
+    # Adjust for weeks_ago
+    if weeks_ago > 0:
+        current_monday = current_monday - timedelta(weeks=weeks_ago)
+
     return current_monday.replace(hour=0, minute=0, second=0, microsecond=0)

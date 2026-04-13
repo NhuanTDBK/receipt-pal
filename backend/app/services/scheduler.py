@@ -88,7 +88,7 @@ async def initialize_scheduler() -> None:
         replace_existing=True,
     )
 
-    # Weekly report job: runs every Sunday at configured time for current week
+    # Weekly report job: runs every Sunday at configured time for previous week
     scheduler.add_job(
         _send_weekly_reports,
         trigger=CronTrigger(day_of_week="sun", hour=report_hour, minute=report_minute),
@@ -317,11 +317,11 @@ async def _generate_monthly_memories() -> None:
 
 
 async def _send_weekly_reports() -> None:
-    """Send weekly usage reports to all users with reports enabled for current week."""
+    """Send weekly usage reports to all users with reports enabled for previous week."""
     logger.info("Starting weekly usage report generation for all users")
 
-    # Get current week's Monday
-    week_start = await get_current_week_start()
+    # Get previous week's Monday (scheduler runs on Sunday evening)
+    week_start = await get_current_week_start(weeks_ago=1)
 
     async with async_session_factory() as session:
         # Get users with weekly reports enabled
